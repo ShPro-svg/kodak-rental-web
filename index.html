@@ -496,37 +496,33 @@
         });
 
         // 5. Logik Submit Form ke WhatsApp
-        document.getElementById('bookingForm').addEventListener('submit', function(e) {
-            e.preventDefault();
+        document.getElementById('bookingForm').addEventListener('submit', async function(e) {
+    e.preventDefault();
+    if(totalDays === 0) { alert("Select dates first!"); return; }
 
-            if(totalDays === 0) {
-                alert("Please select your rental dates on the calendar first.");
-                return;
-            }
+    const bookingData = {
+        customer_name: document.getElementById('name').value,
+        start_date: startDateStr.split('/').reverse().join('-'), // Tukar ke format YYYY-MM-DD
+        end_date: endDateStr.split('/').reverse().join('-'),
+        pickup_time: document.getElementById('pickupTime').value,
+        return_time: document.getElementById('returnTime').value,
+        location: document.getElementById('location').value,
+        status: 'pending' // Default pending
+    };
 
-            const name = document.getElementById('name').value;
-            const pickupTime = document.getElementById('pickupTime').value;
-            const returnTime = document.getElementById('returnTime').value;
-            const location = document.getElementById('location').value;
+    // 1. Simpan ke Supabase dulu
+    const { data, error } = await supabaseClient.from('bookings').insert([bookingData]).select();
 
-            // MASUKKAN NOMBOR TELEFON KAU DI SINI
-            const phoneNumber = "60123456789"; 
-
-            // Susunan mesej dirapatkan ke kiri supaya kemas dalam WhatsApp
-            const message = 
-`Hi! I'm interested in renting the Kodak PIXPRO FZ55. Here are my details:
-
-Name: ${name}
-Date: ${startDateStr} to ${endDateStr} (${totalDays} Days)
-Pickup Time: ${pickupTime}
-Return Time: ${returnTime}
-Location: ${location}
-
-Is the camera available for these dates?`;
-
-            const encodedMessage = encodeURIComponent(message);
-            window.open(`https://wa.me/${phoneNumber}?text=${encodedMessage}`, '_blank');
-        });
+    if (error) {
+        alert("Error saving booking: " + error.message);
+    } else {
+        // 2. Kalau sukses, baru buka WhatsApp
+        const bookingId = data[0].id;
+        const phoneNumber = "601139585168"; 
+        const message = `Hi! I've placed a booking (ID: ${bookingId.slice(0,5)}). Please check the admin dashboard.`;
+        window.open(`https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`, '_blank');
+    }
+});
     </script>
 </body>
 </html>

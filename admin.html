@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard | Kodak Rental</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root {
+            --bg-base: #F4F4F5;
+            --primary-dark: #0A2E4A;
+            --accent-green: #DDF3CF;
+            --brand-blue: #2C7FFF;
+            --text-main: #020617;
+        }
+        body { font-family: 'Poppins', sans-serif; background: var(--bg-base); padding: 20px; color: var(--text-main); }
+        .container { max-width: 1000px; margin: 0 auto; }
+        
+        .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px; }
+        .stat-card { background: white; padding: 20px; border-radius: 20px; border: 1px solid #E4E4E7; }
+        .stat-card span { font-size: 0.8rem; color: #52525C; text-transform: uppercase; font-weight: 600; }
+        .stat-card h2 { font-size: 1.5rem; color: var(--brand-blue); margin-top: 5px; }
+
+        .card { background: white; border-radius: 24px; padding: 25px; border: 1px solid #E4E4E7; margin-bottom: 20px; overflow-x: auto; }
+        .card h3 { margin-bottom: 20px; display: flex; align-items: center; gap: 10px; color: var(--primary-dark); }
+        
+        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; min-width: 600px; }
+        th { text-align: left; padding: 12px; border-bottom: 2px solid var(--bg-base); color: #52525C; }
+        td { padding: 15px 12px; border-bottom: 1px solid var(--bg-base); }
+        
+        .status-badge { padding: 6px 12px; border-radius: 8px; font-size: 0.7rem; font-weight: 600; text-transform: uppercase; }
+        .status-pending { background: #FEF3C7; color: #92400E; }
+        .status-confirmed { background: var(--accent-green); color: #064E3B; }
+
+        .btn-action { padding: 8px 12px; border-radius: 8px; border: none; cursor: pointer; font-size: 0.75rem; font-weight: 600; transition: 0.2s; }
+        .btn-approve { background: var(--brand-blue); color: white; margin-right: 5px; }
+        .btn-delete { background: #FEE2E2; color: #991B1B; }
+        .btn-sop { background: var(--primary-dark); color: white; text-decoration: none; display: inline-block; padding: 8px 12px; border-radius: 8px; margin-top: 8px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header" style="margin-bottom: 20px;">
+            <h2><i class="ph-fill ph-shield-check"></i> Admin Panel</h2>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <span>Total Confirmed Income</span>
+                <h2 id="totalIncome">RM 0.00</h2>
+            </div>
+            <div class="stat-card">
+                <span>Confirmed Bookings</span>
+                <h2 id="activeCount">0</h2>
+            </div>
+        </div>
+
+        <div class="card">
+            <h3><i class="ph ph-list-bullets"></i> Booking Requests</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Customer</th>
+                        <th>Rental Dates</th>
+                        <th>Logistics</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="bookingTable">
+                    <tr><td colspan="5" style="text-align: center;">Loading data...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        // MASUKKAN KREDENSIAL SUPABASE KAU DI SINI
+        const SUPABASE_URL = "https://udoncfzvxixbmjwkogew.supabase.co/rest/v1/";
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVkb25jZnp2eGl4Ym1qd2tvZ2V3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk4OTIzNjYsImV4cCI6MjA5NTQ2ODM2Nn0.dH7XDMhJMDaygZDL_rGU72wK2BU_QjiMJ-Iu0kcZ0jw";
+        
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        async function loadAdmin() {
+            const { data, error } = await supabaseClient.from('bookings').select('*').order('created_at', { ascending: false });
+            if (error) {
+                console.error(error);
+                return;
+            }
+
+            let income = 0;
+            let active = 0;
+            const table = document.getElementById('bookingTable');
+            table.innerHTML = '';
+
+            if(data.length === 0) {
+                table.innerHTML = '<tr><td colspan="5" style="text-align: center;">No bookings yet.</td></tr>';
+                return;
+            }
+
+            data.forEach(b => {
+                const start = new Date(b.start_date);
+                const end = new Date(b.end_date);
+                const diffDays = Math.ceil(Math.abs(end - start) / (1000 * 60 * 60 * 24)) || 1;
+                
+                // Pengiraan harga ikut hari
+                let rate = 25;
+                if (diffDays >= 7) rate = 15;
+                else if (diffDays >= 4) rate = 20;
+                
+                const totalPrice = (rate * diffDays) + 20; // Sewa + Deposit
+
+                if (b.status === 'confirmed') {
+                    income += (rate * diffDays); // Kira untung sewa sahaja (deposit tak kira sbg untung)
+                    active++;
+                }
+
+                table.innerHTML += `
+                    <tr>
+                        <td><strong>${b.customer_name}</strong></td>
+                        <td>${b.start_date} <br>to<br> ${b.end_date} <br><small>(${diffDays} days)</small></td>
+                        <td><small>Pick: ${b.pickup_time}<br>Ret: ${b.return_time}<br>Loc: ${b.location}</small></td>
+                        <td><span class="status-badge status-${b.status}">${b.status}</span></td>
+                        <td>
+                            ${b.status === 'pending' ? `<button class="btn-action btn-approve" onclick="updateStatus('${b.id}', 'confirmed')">Approve Dates</button>` : ''}
+                            <button class="btn-action btn-delete" onclick="deleteBooking('${b.id}')">Delete</button>
+                            <br>
+                            <a href="sop.html?id=${b.id}&price=${totalPrice}" target="_blank" class="btn-sop">View SOP Link</a>
+                        </td>
+                    </tr>
+                `;
+            });
+
+            document.getElementById('totalIncome').innerText = `RM ${income.toFixed(2)}`;
+            document.getElementById('activeCount').innerText = active;
+        }
+
+        async function updateStatus(id, status) {
+            await supabaseClient.from('bookings').update({ status }).eq('id', id);
+            loadAdmin();
+        }
+
+        async function deleteBooking(id) {
+            if(confirm("Are you sure you want to delete this booking?")) {
+                await supabaseClient.from('bookings').delete().eq('id', id);
+                loadAdmin();
+            }
+        }
+
+        loadAdmin();
+    </script>
+</body>
+</html>

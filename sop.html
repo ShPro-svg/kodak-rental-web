@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SOP & Payment | Kodak Rental</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <style>
+        :root {
+            --bg-base: #F4F4F5;
+            --primary-dark: #020617;
+            --brand-blue: #2C7FFF;
+            --border-strong: #E4E4E7;
+        }
+        body { font-family: 'Poppins', sans-serif; background: var(--bg-base); padding: 15px; color: var(--primary-dark); }
+        .wrapper { max-width: 600px; margin: 0 auto; }
+        
+        .header { text-align: center; margin-bottom: 20px; }
+        .header h1 { font-size: 1.5rem; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        
+        .card { background: white; border: 1px solid var(--border-strong); border-radius: 20px; padding: 25px; margin-bottom: 20px; }
+        .card h2 { font-size: 1.1rem; margin-bottom: 15px; color: var(--primary-dark); display: flex; align-items: center; gap: 8px; }
+        
+        /* Terms Scroll Box */
+        .terms-box { height: 250px; overflow-y: scroll; border: 1px solid var(--border-strong); padding: 15px; font-size: 0.8rem; border-radius: 12px; background: #FAFAFA; margin-bottom: 15px; line-height: 1.6; }
+        .terms-box h4 { margin-top: 15px; margin-bottom: 5px; color: var(--brand-blue); }
+        .terms-box h4:first-child { margin-top: 0; }
+        
+        .checkbox-container { display: flex; align-items: center; gap: 10px; font-size: 0.9rem; font-weight: 600; background: #DBEAFE; padding: 15px; border-radius: 12px; color: #1E3A8A; cursor: pointer; }
+        .checkbox-container input { width: 18px; height: 18px; cursor: pointer; }
+
+        /* Payment Section */
+        .payment-info { background: #020617; color: white; padding: 20px; border-radius: 16px; text-align: center; margin-bottom: 15px; }
+        .payment-info h3 { margin: 0 0 5px 0; font-size: 1.2rem; }
+        .payment-info p { margin: 0; font-size: 0.9rem; opacity: 0.8; }
+        .payment-info .acc-no { font-size: 1.5rem; font-weight: 700; letter-spacing: 1px; margin: 10px 0; color: #DDF3CF; }
+        
+        /* Upload Area */
+        .upload-area { border: 2px dashed var(--border-strong); border-radius: 12px; padding: 20px; text-align: center; cursor: pointer; margin-bottom: 15px; transition: 0.2s; }
+        .upload-area:hover { border-color: var(--brand-blue); background: #F8FAFF; }
+        .upload-area i { font-size: 2rem; color: var(--brand-blue); margin-bottom: 10px; }
+        .upload-area p { margin: 0; font-size: 0.85rem; font-weight: 500; }
+        .file-name { font-size: 0.75rem; color: #52525C; margin-top: 5px; }
+        
+        #signature-pad { border: 1px solid var(--border-strong); border-radius: 12px; width: 100%; height: 200px; background: #FAFAFA; touch-action: none; }
+        
+        .btn-submit { width: 100%; padding: 16px; background: var(--brand-blue); color: white; border: none; border-radius: 12px; font-weight: 600; font-size: 1rem; margin-top: 10px; cursor: pointer; transition: 0.2s; opacity: 0.5; pointer-events: none; }
+        .btn-submit.active { opacity: 1; pointer-events: auto; }
+        .btn-submit:hover { background: #1e5fc2; }
+        
+        .hidden-section { display: none; }
+        .hidden-section.show { display: block; animation: fadeIn 0.5s; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+
+    </style>
+</head>
+<body>
+    <div class="wrapper">
+        <div class="header">
+            <h1><i class="ph-fill ph-file-text"></i> Rental Agreement</h1>
+            <p style="font-size: 0.85rem; color: #52525C;">Kodak Digicam KL</p>
+        </div>
+
+        <div class="card">
+            <h2>1. Terms & Conditions</h2>
+            <div class="terms-box">
+                <h4>📸 TERMA & SYARAT (T&C) RASMI SEWAAN DIGICAM KODAK</h4>
+                <p><strong>1. Harga Sewaan & Pakej</strong><br>
+                Kadar Sewa:<br>
+                1 - 3 Hari: RM25 / hari<br>
+                4 - 6 Hari: RM20 / hari<br>
+                7 Hari ke atas: RM15 / hari<br>
+                Pakej Termasuk: 1x Kamera Kodak, 1x Bateri, 1x SD Card, 1x SD Card Reader (Type-C / Lightning), 1x Hand Strap, dan 1x Pouch / Beg Kamera.<br>
+                Deposit Keselamatan: RM20. (Deposit akan dipulangkan 100% sebaik sahaja kamera dan aksesori dipulangkan dalam keadaan baik).</p>
+
+                <p><strong>2. Proses Tempahan & Pembatalan (Cancellation)</strong><br>
+                Booking tarikh hanya sah selepas bayaran penuh (Sewa + Deposit) dibuat. Konsep First Pay, First Serve.<br>
+                Pembatalan: Lebih 24 jam: Refund penuh 100%. Kurang 24 jam: Deposit RM20 akan burn, duit sewa dipulangkan.</p>
+
+                <p><strong>3. Dokumen Keselamatan (Wajib)</strong><br>
+                Penyewa perlu menghantar gambar Kad Matrik / IC depan (Palang: "UNTUK SEWAAN DIGICAM SAHAJA"). Dokumen dirahsiakan.</p>
+
+                <p><strong>4. Pengambilan & Pemulangan (Pickup & Return)</strong><br>
+                Lewat Pulang: Denda RM5 untuk setiap jam lewat dikenakan. Sila maklumkan awal jika ada masalah.</p>
+
+                <p><strong>5. Tanggungjawab Kerosakan & Kehilangan</strong><br>
+                Kamera ini TIDAK kalis air. Jika aksesori rosak, tolak dari deposit (SD Reader RM15, Bateri/SD RM25). Kerosakan Kritikal/Hilang Kamera: Penyewa wajib menanggung kos baik pulih atau menggantikan kamera mengikut harga pasaran (RM300).</p>
+
+                <p><strong>6. Pengurusan Fail & Privasi</strong><br>
+                Penyewa wajib transfer gambar sendiri. Kad akan di-format selepas pulang. Kami tidak menyimpan salinan.</p>
+
+                <hr style="margin: 20px 0; border: 0; border-top: 1px dashed #ccc;">
+
+                <h4>📸 OFFICIAL TERMS & CONDITIONS (T&C)</h4>
+                <p><strong>1. Rental Price & Package</strong><br>
+                Rates: 1-3 Days (RM25/day), 4-6 Days (RM20/day), 7+ Days (RM15/day).<br>
+                Package: Camera, Battery, SD Card, Reader, Strap, Pouch.<br>
+                Deposit: RM20 (100% refundable if returned in good condition).</p>
+
+                <p><strong>2. Booking & Cancellation</strong><br>
+                Booking confirmed upon full payment. Cancellation >24h: Full refund. Cancellation <24h: Deposit forfeited.</p>
+
+                <p><strong>3. Security Documents</strong><br>
+                Student ID / IC copy required (Watermarked for rental only). Kept confidential.</p>
+
+                <p><strong>4. Pickup & Return</strong><br>
+                Late Return: RM5 penalty per hour.</p>
+
+                <p><strong>5. Responsibility & Damage</strong><br>
+                NOT waterproof. Lost accessories deducted from deposit (Reader RM15, Battery/SD RM25). Critical Damage/Loss: Renter bears full repair or replacement cost (Current market value ~RM300).</p>
+
+                <p><strong>6. Privacy</strong><br>
+                Transfer your own files. SD card will be formatted upon return.</p>
+            </div>
+
+            <label class="checkbox-container">
+                <input type="checkbox" id="agreeBtn" onclick="toggleSections()">
+                Saya setuju dengan Terma & Syarat di atas. (I agree to the T&C)
+            </label>
+        </div>
+
+        <div id="actionSections" class="hidden-section">
+            
+            <div class="card">
+                <h2>2. Payment & Verification</h2>
+                
+                <div class="payment-info">
+                    <h3>Maybank / DuitNow</h3>
+                    <div class="acc-no">1142 3456 7890</div>
+                    <p>MUHAMMAD SHAMSIR BIN ISMAIL</p>
+                    <p style="margin-top: 10px; color: #A6F5C0; font-size: 0.8rem;">Sila buat pembayaran penuh (Sewa + Deposit RM20) untuk sahkan tarikh.</p>
+                </div>
+
+                <div class="upload-area" onclick="document.getElementById('icInput').click()">
+                    <i class="ph ph-identification-card"></i>
+                    <p>Upload IC / Student Card</p>
+                    <div id="icFileName" class="file-name">No file selected</div>
+                    <input type="file" id="icInput" accept="image/*,application/pdf" style="display:none" onchange="updateFileName('icInput', 'icFileName')">
+                </div>
+
+                <div class="upload-area" onclick="document.getElementById('receiptInput').click()">
+                    <i class="ph ph-receipt"></i>
+                    <p>Upload Payment Receipt</p>
+                    <div id="receiptFileName" class="file-name">No file selected</div>
+                    <input type="file" id="receiptInput" accept="image/*,application/pdf" style="display:none" onchange="updateFileName('receiptInput', 'receiptFileName')">
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>3. Digital Signature</h2>
+                <p style="font-size: 0.8rem; color: #52525C; margin-bottom: 10px;">Dengan tandatangan ini, perjanjian ini sah di sisi undang-undang.</p>
+                <canvas id="signature-pad"></canvas>
+                <button onclick="signaturePad.clear()" style="font-size: 0.75rem; margin-top: 10px; padding: 5px 10px; border-radius: 6px; border: 1px solid #ccc; cursor:pointer;">Clear Signature</button>
+            </div>
+
+            <button id="submitBtn" class="btn-submit" onclick="submitForm()">Complete Agreement</button>
+        </div>
+
+    </div>
+
+    <script>
+        // Setup Signature Pad
+        const canvas = document.getElementById("signature-pad");
+        
+        // Adjust canvas resolution for high DPI screens (Mobile phones)
+        function resizeCanvas() {
+            const ratio =  Math.max(window.devicePixelRatio || 1, 1);
+            canvas.width = canvas.offsetWidth * ratio;
+            canvas.height = canvas.offsetHeight * ratio;
+            canvas.getContext("2d").scale(ratio, ratio);
+        }
+        window.onresize = resizeCanvas;
+        resizeCanvas();
+
+        const signaturePad = new SignaturePad(canvas, {
+            penColor: "rgb(2, 6, 23)"
+        });
+
+        // Toggle Sections Logic
+        function toggleSections() {
+            const isAgreed = document.getElementById('agreeBtn').checked;
+            const sections = document.getElementById('actionSections');
+            const submitBtn = document.getElementById('submitBtn');
+            
+            if (isAgreed) {
+                sections.classList.add('show');
+                submitBtn.classList.add('active');
+            } else {
+                sections.classList.remove('show');
+                submitBtn.classList.remove('active');
+            }
+        }
+
+        // Update File Name Display
+        function updateFileName(inputId, displayId) {
+            const input = document.getElementById(inputId);
+            const display = document.getElementById(displayId);
+            if(input.files.length > 0) {
+                display.innerText = input.files[0].name;
+                display.style.color = "#2C7FFF";
+                display.style.fontWeight = "600";
+            }
+        }
+
+        // Submit Form Logic
+        function submitForm() {
+            const icFile = document.getElementById('icInput').files.length;
+            const receiptFile = document.getElementById('receiptInput').files.length;
+
+            if (icFile === 0) { alert("Sila muat naik IC / Kad Matrik."); return; }
+            if (receiptFile === 0) { alert("Sila muat naik Resit Pembayaran."); return; }
+            if (signaturePad.isEmpty()) { alert("Sila tandatangan di ruangan yang disediakan."); return; }
+
+            alert("Terima kasih! Maklumat dan pembayaran anda sedang diproses. \n(Sistem Google Apps Script akan diaktifkan di sini untuk hantar ke Google Drive).");
+            
+            // Di sini kod fetch() ke Google Apps Script (GAS) Webhook akan dimasukkan nanti.
+        }
+    </script>
+</body>
+</html>
