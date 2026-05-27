@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Kodak Digicam KL Rental</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <style>
+        :root {
+            /* NEW COLOR SYSTEM (MARINA BUDARINA) */
+            --bg-white: #FFFFFF;
+            --bg-base: #F4F4F5;
+            --text-primary: #020617;
+            --text-secondary: #52525C;
+            --border-subtle: #F4F4F5;
+            --border-strong: #E4E4E7;
+            
+            --brand-base: #2C7FFF; /* Bright Blue */
+            --brand-subtle: #DBEAFE; /* Light Blue for highlights */
+            
+            --highlight-green: #DDF3CF;
+            
+            /* Status Booked */
+            --status-booked-bg: #F4F4F5; 
+            --status-booked-text: #52525C; 
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            background-color: var(--bg-white); /* Pure white background */
+            color: var(--text-primary);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            /* Padding atas bawah untuk mobile */
+            padding: 20px 15px 40px; 
+        }
+
+        .app-wrapper {
+            width: 100%;
+            max-width: 500px; /* Saiz ngam untuk mobile & tablet */
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* --- HEADER --- */
+        .header {
+            text-align: center;
+            padding: 10px 0 20px;
+        }
+
+        .header h1 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            letter-spacing: -0.5px;
+        }
+
+        .header p {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-top: 5px;
+        }
+
+        /* --- CARD STYLE (Clean & Flat) --- */
+        .card {
+            background: var(--bg-white);
+            border: 1px solid var(--border-strong);
+            border-radius: 20px;
+            padding: 20px;
+            box-shadow: 0 4px 20px rgba(2, 6, 23, 0.03); /* Bayang sangat nipis */
+        }
+
+        /* --- PRODUCT IMAGE --- */
+        .product-image-container {
+            width: 100%;
+            border-radius: 16px;
+            padding: 0; /* Buang padding supaya gambar rapat ke dinding */
+            margin-bottom: 20px;
+            overflow: hidden; /* Pastikan bucu gambar terpotong jadi bulat ikut container */
+            border: 1px solid var(--border-strong); /* Pilihan: Letak border halus supaya nampak kemas */
+        }
+
+        .camera-image {
+            width: 100%; /* Bagi gambar tarik 100% penuh */
+            height: auto;
+            display: block;
+            /* Aku dah buang drop-shadow sebab tak sesuai untuk gambar berpetak */
+        }
+
+        .camera-image[content*='kodak']:-moz-broken,
+        .camera-image[content*='kodak']:empty {
+            opacity: 0.3;
+            border: 2px dashed var(--border-strong);
+            padding: 20px;
+            text-align: center;
+            font-size: 0.8rem;
+        }
+
+        /* --- INFO SECTION (Rates & Package) --- */
+        .section-title {
+            font-size: 1rem;
+            font-weight: 600;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .rate-list, .package-list {
+            list-style: none;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+        }
+
+        .rate-list li, .package-list li {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid var(--border-subtle);
+        }
+        .rate-list li:last-child { border-bottom: none; }
+
+        .rate-list span.price { font-weight: 600; color: var(--brand-base); }
+
+        .package-list li { justify-content: flex-start; gap: 10px; border: none; padding: 6px 0; }
+        .package-list li i { color: var(--brand-base); font-size: 1.2rem; }
+
+        /* --- BUTTONS --- */
+        .btn-primary {
+            width: 100%;
+            padding: 16px;
+            background: var(--brand-base);
+            color: white;
+            border: none;
+            border-radius: 14px;
+            font-size: 1rem;
+            font-weight: 600;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+            transition: transform 0.2s, background 0.2s;
+        }
+        .btn-primary:active { transform: scale(0.98); }
+        .btn-primary:hover { background: #1e5fc2; }
+
+        /* --- TIRAI (ACCORDION / COLLAPSIBLE) --- */
+        .tirai-wrapper {
+            display: grid;
+            grid-template-rows: 0fr;
+            transition: grid-template-rows 0.4s ease-out;
+            margin-top: 10px;
+        }
+
+        .tirai-wrapper.open {
+            grid-template-rows: 1fr;
+        }
+
+        .tirai-content {
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        /* Peringatan animasi masuk */
+        .tirai-inner {
+            padding-top: 10px;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: opacity 0.4s ease, transform 0.4s ease;
+            transition-delay: 0.1s;
+        }
+        .tirai-wrapper.open .tirai-inner {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        /* --- CALENDAR (FLATPICKR KEMAS) --- */
+        .legend {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            margin-bottom: 15px;
+            padding: 0 10px;
+        }
+        .legend div { display: flex; align-items: center; gap: 6px; }
+        .dot { width: 10px; height: 10px; border-radius: 3px; }
+        .dot.av { background: var(--bg-white); border: 1px solid var(--border-strong); }
+        .dot.bk { background: var(--bg-base); display: flex; justify-content: center; align-items: center; color: var(--text-secondary); font-size: 0.6rem; font-weight: bold; text-decoration: line-through; }
+        .dot.sl { background: var(--brand-base); }
+
+        .flatpickr-calendar.inline {
+            width: 100%;
+            box-shadow: none;
+            border: 1px solid var(--border-strong);
+            border-radius: 16px;
+            padding: 10px;
+        }
+        .flatpickr-months .flatpickr-month { color: var(--text-primary); font-weight: 600; }
+        span.flatpickr-weekday { color: var(--text-secondary); font-weight: 500; font-size: 0.8rem; }
+        .flatpickr-day {
+            border-radius: 8px;
+            color: var(--text-primary);
+            border: 1px solid transparent;
+            margin: 2px 0;
+            font-weight: 500;
+        }
+        
+        /* Booked Date Style */
+        .flatpickr-day.flatpickr-disabled {
+            color: #A1A1AA !important; /* Muted gray */
+            background: var(--bg-base) !important;
+            text-decoration: line-through;
+            border: none !important;
+            cursor: not-allowed;
+        }
+
+        /* Selection Style */
+        .flatpickr-day.selected, .flatpickr-day.startRange, .flatpickr-day.endRange {
+            background: var(--brand-base) !important;
+            border-color: var(--brand-base) !important;
+            color: white !important;
+        }
+        .flatpickr-day.inRange {
+            background: var(--brand-subtle);
+            border-color: var(--brand-subtle);
+            box-shadow: -5px 0 0 var(--brand-subtle), 5px 0 0 var(--brand-subtle);
+            color: var(--brand-base);
+            font-weight: 600;
+        }
+
+        /* --- FORM --- */
+        .summary-box {
+            background: var(--highlight-green);
+            border-radius: 12px;
+            padding: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        .summary-box .info { display: flex; flex-direction: column; }
+        .summary-box span.title { font-size: 0.75rem; color: var(--text-secondary); text-transform: uppercase; }
+        .summary-box span.val { font-size: 0.9rem; font-weight: 700; color: var(--text-primary); }
+        .summary-box .days { font-size: 1.1rem; font-weight: 700; color: var(--text-primary); }
+
+        .form-group { margin-bottom: 15px; }
+        .form-group label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 6px;
+        }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        
+        input, select {
+            width: 100%;
+            padding: 14px;
+            border-radius: 10px;
+            border: 1px solid var(--border-strong);
+            background: var(--bg-white);
+            font-size: 0.9rem;
+            color: var(--text-primary);
+            outline: none;
+            -webkit-appearance: none; /* Buang default style di iPhone */
+        }
+        input:focus, select:focus {
+            border-color: var(--brand-base);
+            box-shadow: 0 0 0 3px var(--brand-subtle);
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="app-wrapper">
+        
+        <div class="header">
+            <h1><i class="ph-fill ph-camera"></i> Kodak KL</h1>
+            <p>Rent PIXPRO FZ55 • Authentic Retro Vibes</p>
+        </div>
+
+        <div class="card">
+            <div class="product-image-container">
+                <img src="kodak-fz55.png" alt="Kodak Camera" class="camera-image">
+            </div>
+
+            <h2 class="section-title"><i class="ph ph-tag"></i> Rental Rates</h2>
+            <ul class="rate-list">
+                <li><span>1 - 3 Days</span> <span class="price">RM 25 / day</span></li>
+                <li><span>4 - 6 Days</span> <span class="price">RM 20 / day</span></li>
+                <li><span>7+ Days</span> <span class="price">RM 15 / day</span></li>
+            </ul>
+
+            <h2 class="section-title" style="margin-top: 25px;"><i class="ph ph-package"></i> Complete Set Includes</h2>
+            <ul class="package-list">
+                <li><i class="ph-fill ph-check-circle"></i> Camera PIXPRO FZ55</li>
+                <li><i class="ph-fill ph-check-circle"></i> 16GB SD Card</li>
+                <li><i class="ph-fill ph-check-circle"></i> Card Reader (Type-C/iPhone)</li>
+                <li><i class="ph-fill ph-check-circle"></i> Strap & Pouch Bag</li>
+            </ul>
+        </div>
+
+        <button class="btn-primary" id="btnToggleTirai">
+            <i class="ph ph-calendar-check"></i> Check Availability
+        </button>
+
+        <div class="tirai-wrapper" id="bookingTirai">
+            <div class="tirai-content">
+                <div class="tirai-inner">
+                    
+                    <div class="card">
+                        <div class="legend">
+                            <div><div class="dot av"></div> Available</div>
+                            <div><div class="dot bk">x</div> Booked</div>
+                            <div><div class="dot sl"></div> Selected</div>
+                        </div>
+                        <input type="text" id="inline-calendar" style="display: none;">
+                    </div>
+
+                    <div class="card" style="margin-top: 20px;">
+                        <div class="summary-box">
+                            <div class="info">
+                                <span class="title">Selected Dates</span>
+                                <span class="val" id="displayDates">Choose on calendar</span>
+                            </div>
+                            <div class="days" id="displayDays">0 Days</div>
+                        </div>
+
+                        <form id="bookingForm">
+                            <div class="form-group">
+                                <label for="name">Full Name</label>
+                                <input type="text" id="name" placeholder="Name on IC/Student Card" required>
+                            </div>
+
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="pickupTime">Pickup Time</label>
+                                    <select id="pickupTime" required>
+                                        <option value="" disabled selected>Select</option>
+                                        <option value="10:00 AM">10:00 AM</option>
+                                        <option value="12:00 PM">12:00 PM</option>
+                                        <option value="2:00 PM">2:00 PM</option>
+                                        <option value="5:00 PM">5:00 PM</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="returnTime">Return Time</label>
+                                    <select id="returnTime" required>
+                                        <option value="" disabled selected>Select</option>
+                                        <option value="10:00 AM">10:00 AM</option>
+                                        <option value="12:00 PM">12:00 PM</option>
+                                        <option value="2:00 PM">2:00 PM</option>
+                                        <option value="5:00 PM">5:00 PM</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="form-group" style="margin-bottom: 25px;">
+                                <label for="location">Meetup Location</label>
+                                <input type="text" id="location" placeholder="e.g. UTM KL, LRT Station" required>
+                            </div>
+
+                            <button type="submit" class="btn-primary" style="background: var(--text-primary);">
+                                <i class="ph ph-whatsapp-logo"></i> Confirm & WhatsApp
+                            </button>
+                        </form>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    
+    <script>
+        // 1. ISI DETAIL SUPABASE KAU DI SINI
+        // GANTI INI: Mesti format https://[KOD-PROJEK-KAU].supabase.co
+        const SUPABASE_URL = "https://udoncfzvxixbmjwkogew.supabase.co/rest/v1/"; 
+        
+        // Anon key kau dah betul
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVkb25jZnp2eGl4Ym1qd2tvZ2V3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk4OTIzNjYsImV4cCI6MjA5NTQ2ODM2Nn0.dH7XDMhJMDaygZDL_rGU72wK2BU_QjiMJ-Iu0kcZ0jw";
+
+        // Initialize Supabase Client (Sintaks yang BETUL)
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        let totalDays = 0;
+        let startDateStr = '';
+        let endDateStr = '';
+        let fpInstance; 
+
+        // 2. Fungsi untuk tarik tarikh yang dah di-book dari Supabase
+        async function fetchBookedDates() {
+            try {
+                // Guna supabaseClient, bukan supabase
+                const { data, error } = await supabaseClient
+                    .from('bookings')
+                    .select('start_date, end_date')
+                    .eq('status', 'confirmed');
+
+                if (error) throw error;
+
+                const disabledRanges = data.map(booking => ({
+                    from: booking.start_date,
+                    to: booking.end_date
+                }));
+
+                fpInstance.set('disable', disabledRanges);
+
+            } catch (err) {
+                console.error("Gagal menarik data kalendar:", err.message);
+            }
+        }
+
+        // 3. Initialize Big Inline Calendar
+        fpInstance = flatpickr("#inline-calendar", {
+            inline: true, 
+            mode: "range",
+            minDate: "today",
+            dateFormat: "Y-m-d",
+            disable: [],
+
+            onChange: function(selectedDates, dateStr, instance) {
+                if (selectedDates.length === 2) {
+                    const diffTime = Math.abs(selectedDates[1] - selectedDates[0]);
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                    
+                    totalDays = diffDays === 0 ? 1 : diffDays; 
+                    
+                    startDateStr = selectedDates[0].toLocaleDateString('en-GB');
+                    endDateStr = selectedDates[1].toLocaleDateString('en-GB');
+                    
+                    document.getElementById('displayDates').innerText = `${startDateStr} - ${endDateStr}`;
+                    document.getElementById('displayDays').innerText = `${totalDays} Days`;
+                } else if (selectedDates.length === 1) {
+                    document.getElementById('displayDates').innerText = "Select return date...";
+                } else {
+                    totalDays = 0;
+                    document.getElementById('displayDates').innerText = "Choose on calendar";
+                    document.getElementById('displayDays').innerText = "0 Days";
+                }
+            }
+        });
+
+        fetchBookedDates();
+
+        // 4. Logik Butang Tirai (Accordion)
+        const btnToggle = document.getElementById('btnToggleTirai');
+        const tirai = document.getElementById('bookingTirai');
+
+        btnToggle.addEventListener('click', () => {
+            const isOpen = tirai.classList.contains('open');
+            if (isOpen) {
+                tirai.classList.remove('open');
+                btnToggle.innerHTML = '<i class="ph ph-calendar-check"></i> Check Availability';
+                btnToggle.style.background = 'var(--brand-base)';
+            } else {
+                tirai.classList.add('open');
+                btnToggle.innerHTML = '<i class="ph ph-x"></i> Close Calendar';
+                btnToggle.style.background = 'var(--text-secondary)';
+                
+                setTimeout(() => {
+                    fpInstance.redraw();
+                    tirai.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 300);
+            }
+        });
+
+        // 5. Logik Submit Form ke WhatsApp
+        document.getElementById('bookingForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+
+            if(totalDays === 0) {
+                alert("Please select your rental dates on the calendar first.");
+                return;
+            }
+
+            const name = document.getElementById('name').value;
+            const pickupTime = document.getElementById('pickupTime').value;
+            const returnTime = document.getElementById('returnTime').value;
+            const location = document.getElementById('location').value;
+
+            // MASUKKAN NOMBOR TELEFON KAU DI SINI
+            const phoneNumber = "60123456789"; 
+
+            // Susunan mesej dirapatkan ke kiri supaya kemas dalam WhatsApp
+            const message = 
+`Hi! I'm interested in renting the Kodak PIXPRO FZ55. Here are my details:
+
+Name: ${name}
+Date: ${startDateStr} to ${endDateStr} (${totalDays} Days)
+Pickup Time: ${pickupTime}
+Return Time: ${returnTime}
+Location: ${location}
+
+Is the camera available for these dates?`;
+
+            const encodedMessage = encodeURIComponent(message);
+            window.open(`https://wa.me/${phoneNumber}?text=${encodedMessage}`, '_blank');
+        });
+    </script>
+</body>
+</html>
