@@ -204,18 +204,72 @@
             }
         }
 
-        // Submit Form Logic
-        function submitForm() {
-            const icFile = document.getElementById('icInput').files.length;
-            const receiptFile = document.getElementById('receiptInput').files.length;
+        // Fungsi helper untuk tukar fail gambar jadi teks Base64
+        const toBase64 = file => new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = error => reject(error);
+        });
 
-            if (icFile === 0) { alert("Sila muat naik IC / Kad Matrik."); return; }
-            if (receiptFile === 0) { alert("Sila muat naik Resit Pembayaran."); return; }
+        // Submit Form Logic
+        async function submitForm() {
+            const icInput = document.getElementById('icInput');
+            const receiptInput = document.getElementById('receiptInput');
+
+            if (icInput.files.length === 0) { alert("Sila muat naik IC / Kad Matrik."); return; }
+            if (receiptInput.files.length === 0) { alert("Sila muat naik Resit Pembayaran."); return; }
             if (signaturePad.isEmpty()) { alert("Sila tandatangan di ruangan yang disediakan."); return; }
 
-            alert("Terima kasih! Maklumat dan pembayaran anda sedang diproses. \n(Sistem Google Apps Script akan diaktifkan di sini untuk hantar ke Google Drive).");
-            
-            // Di sini kod fetch() ke Google Apps Script (GAS) Webhook akan dimasukkan nanti.
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.innerText = "Processing... Please wait (Do not close)";
+            submitBtn.style.opacity = "0.5";
+            submitBtn.style.pointerEvents = "none";
+
+            try {
+                // Proses convert gambar
+                const icBase64 = await toBase64(icInput.files[0]);
+                const receiptBase64 = await toBase64(receiptInput.files[0]);
+                const signatureBase64 = signaturePad.toDataURL();
+
+                // Ambil Booking ID dari URL (cth: sop.html?id=12345)
+                const urlParams = new URLSearchParams(window.location.search);
+                const bookingId = urlParams.get('id') || "Manual_Direct";
+
+                const payload = {
+                    bookingId: bookingId,
+                    ic: icBase64,
+                    receipt: receiptBase64,
+                    signature: signatureBase64
+                };
+
+                // GANTIKAN DENGAN WEB APP URL KAU
+                const GAS_URL = "https://script.google.com/macros/s/AKfycbyWG73KcBNUZyTrBVhjecgBKsO8Z_kZ2KmNn4LtBnpXPdNJyJMpHsJhp-dqoae2xSM4FA/exec";
+
+                const response = await fetch(GAS_URL, {
+                    method: "POST",
+                    body: JSON.stringify(payload) // Tukar ke format teks
+                    // Nota: Kita tak guna Content-Type json sebab nak elak isu CORS preflight rumit di sesetengah browser
+                });
+
+                const result = await response.json();
+                
+                if(result.status === "success") {
+                    alert("Berjaya! Perjanjian dan resit anda telah direkodkan. Sila maklumkan kepada admin di WhatsApp.");
+                    window.location.href = "index.html"; // Tendang customer balik ke home
+                } else {
+                    alert("Ralat menyimpan: " + result.message);
+                    submitBtn.innerText = "Complete Agreement";
+                    submitBtn.style.pointerEvents = "auto";
+                    submitBtn.style.opacity = "1";
+                }
+
+            } catch (error) {
+                alert("Ralat sambungan sistem. Sila cuba lagi.");
+                submitBtn.innerText = "Complete Agreement";
+                submitBtn.style.pointerEvents = "auto";
+                submitBtn.style.opacity = "1";
+            }
         }
     </script>
 </body>
