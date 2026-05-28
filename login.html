@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login | Kodak Rental</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root {
+            --bg-base: #F4F4F5;
+            --primary-dark: #0A2E4A;
+            --brand-blue: #2C7FFF;
+            --text-main: #020617;
+            --border-strong: #E4E4E7;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; }
+        body { background: var(--bg-base); display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
+        
+        .login-card { background: white; width: 100%; max-width: 400px; padding: 40px; border-radius: 24px; border: 1px solid var(--border-strong); box-shadow: 0 10px 25px rgba(2, 6, 23, 0.05); }
+        
+        .login-header { text-align: center; margin-bottom: 30px; }
+        .login-header i { font-size: 2.5rem; color: var(--brand-blue); background: #DBEAFE; padding: 15px; border-radius: 50%; margin-bottom: 15px; display: inline-block; }
+        .login-header h2 { color: var(--primary-dark); font-weight: 700; font-size: 1.5rem; }
+        .login-header p { color: #52525C; font-size: 0.9rem; margin-top: 5px; }
+
+        .form-group { margin-bottom: 20px; }
+        .form-group label { display: block; font-size: 0.85rem; font-weight: 600; color: var(--primary-dark); margin-bottom: 8px; }
+        .input-wrapper { position: relative; }
+        .input-wrapper i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); color: #A1A1AA; font-size: 1.1rem; }
+        
+        input { width: 100%; padding: 14px 15px 14px 45px; border-radius: 12px; border: 1px solid var(--border-strong); background: #FAFAFA; font-size: 0.95rem; outline: none; transition: 0.2s; }
+        input:focus { border-color: var(--brand-blue); background: #fff; box-shadow: 0 0 0 3px #DBEAFE; }
+
+        .btn-login { width: 100%; padding: 16px; background: var(--primary-dark); color: white; border: none; border-radius: 12px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: 0.2s; display: flex; justify-content: center; align-items: center; gap: 8px; }
+        .btn-login:hover { background: var(--brand-blue); }
+        .btn-login i.ph-spin { display: none; }
+
+        #errorMessage { color: #991B1B; background: #FEE2E2; padding: 12px; border-radius: 8px; font-size: 0.8rem; text-align: center; margin-bottom: 20px; display: none; font-weight: 500; }
+    </style>
+</head>
+<body>
+    <div class="login-card">
+        <div class="login-header">
+            <i class="ph-fill ph-shield-check"></i>
+            <h2>Admin Login</h2>
+            <p>Kodak Digicam KL Management</p>
+        </div>
+
+        <div id="errorMessage">Invalid email or password.</div>
+
+        <form id="loginForm">
+            <div class="form-group">
+                <label for="email">Admin Email</label>
+                <div class="input-wrapper">
+                    <i class="ph ph-user"></i>
+                    <input type="email" id="email" placeholder="admin@kodakkl.com" required>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="password">Password</label>
+                <div class="input-wrapper">
+                    <i class="ph ph-lock"></i>
+                    <input type="password" id="password" placeholder="••••••••" required>
+                </div>
+            </div>
+            <button type="submit" class="btn-login" id="submitBtn">
+                <i class="ph ph-spinner ph-spin"></i>
+                <i class="ph ph-sign-in"></i> 
+                <span>Login to Dashboard</span>
+            </button>
+        </form>
+    </div>
+
+    <script>
+        // MASUKKAN KREDENSIAL SUPABASE KAU DI SINI
+        const SUPABASE_URL = "https://udoncfzvxixbmjwkogew.supabase.co/rest/v1/";
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVkb25jZnp2eGl4Ym1qd2tvZ2V3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk4OTIzNjYsImV4cCI6MjA5NTQ2ODM2Nn0.dH7XDMhJMDaygZDL_rGU72wK2BU_QjiMJ-Iu0kcZ0jw";
+        
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        const form = document.getElementById('loginForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const errorMsg = document.getElementById('errorMessage');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            errorMsg.style.display = 'none';
+            
+            // Show loading state
+            submitBtn.style.opacity = "0.7";
+            submitBtn.querySelector('i.ph-spin').style.display = 'inline-block';
+            submitBtn.querySelector('i.ph-sign-in').style.display = 'none';
+            submitBtn.querySelector('span').innerText = 'Verifying...';
+
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+
+            // Supabase Email/Password Login
+            const { data, error } = await supabaseClient.auth.signInWithPassword({
+                email: email,
+                password: password,
+            });
+
+            if (error) {
+                errorMsg.style.display = 'block';
+                errorMsg.innerText = "Login failed: " + error.message;
+                
+                // Reset button state
+                submitBtn.style.opacity = "1";
+                submitBtn.querySelector('i.ph-spin').style.display = 'none';
+                submitBtn.querySelector('i.ph-sign-in').style.display = 'inline-block';
+                submitBtn.querySelector('span').innerText = 'Login to Dashboard';
+            } else {
+                // Success! Redirect to admin panel
+                window.location.href = "admin.html";
+            }
+        });
+    </script>
+</body>
+</html>
