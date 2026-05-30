@@ -17,9 +17,9 @@
             --brand-light: #D8ECF9;   /* Ice Blue */
             --brand-dark: #0E1334;    /* Sapphire */
             
-            --bg-white: #FFFFFF;      /* White */
-            --bg-base: #F4F4F5;       /* Light grey background */
-            --text-primary: #0A0A0A;  /* Rich Black */
+            --bg-white: #FFFFFF;      
+            --bg-base: #F4F4F5;       
+            --text-primary: #0A0A0A;  
             --text-secondary: #52525C;
             --border-strong: #E4E4E7;
         }
@@ -58,6 +58,15 @@
         /* CALENDAR CUSTOMIZATION */
         .flatpickr-calendar { width: 100% !important; border-radius: 16px !important; box-shadow: none !important; border: 1px solid var(--border-strong) !important; padding: 10px; }
         .flatpickr-day.selected, .flatpickr-day.startRange, .flatpickr-day.endRange { background: var(--brand-main) !important; border-color: var(--brand-main) !important; }
+        
+        /* CALENDAR DISABLED DATES (MERAH) */
+        .flatpickr-day.flatpickr-disabled,
+        .flatpickr-day.flatpickr-disabled:hover {
+            background: #FEE2E2 !important; /* Merah cair */
+            color: #991B1B !important;    /* Merah pekat */
+            border-color: #FEE2E2 !important;
+            font-weight: 700;
+        }
         
         /* FORM INPUTS */
         .form-group { margin-bottom: 15px; }
@@ -107,6 +116,18 @@
                 <div class="card">
                     <h3 class="card-title"><i class="ph-fill ph-calendar" style="color: var(--brand-main);"></i> Pilih Tarikh</h3>
                     <input type="text" id="calendar" style="display:none;">
+                    
+                    <div style="display: flex; gap: 15px; justify-content: center; margin-top: 15px; font-size: 0.75rem; font-weight: 600; color: var(--text-secondary);">
+                        <div style="display: flex; align-items: center; gap: 5px;">
+                            <div style="width: 12px; height: 12px; background: var(--bg-white); border: 1px solid var(--border-strong); border-radius: 3px;"></div> Available
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 5px;">
+                            <div style="width: 12px; height: 12px; background: #FEE2E2; border-radius: 3px;"></div> Booked
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 5px;">
+                            <div style="width: 12px; height: 12px; background: var(--brand-main); border-radius: 3px;"></div> Selected
+                        </div>
+                    </div>
                     
                     <div style="margin-top:20px; background: var(--brand-light); padding: 15px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--brand-main);">
                         <div>
@@ -169,7 +190,7 @@
     <script>
         // MASUKKAN KREDENSIAL SUPABASE KAU DI SINI
         const SUPABASE_URL = "https://udoncfzvxixbmjwkogew.supabase.co";
-        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVkb25jZnp2eGl4Ym1qd2tvZ2V3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk4OTIzNjYsImV4cCI6MjA5NTQ2ODM2Nn0.dH7XDMhJMDaygZDL_rGU72wK2BU_QjiMJ-Iu0kcZ0jw"; // Pastikan key kau dimasukkan!
+        const SUPABASE_ANON_KEY = "MASUKKAN_ANON_KEY_KAU_DI_SINI"; // Pastikan key kau dimasukkan!
         
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -260,7 +281,7 @@
                 end_date: fpInstance.selectedDates[1].toISOString().split('T')[0],
                 pickup_time: document.getElementById('pickup').value,
                 return_time: document.getElementById('return').value,
-                location: document.getElementById('location').value, // Ambil balik lokasi
+                location: document.getElementById('location').value,
                 status: 'pending'
             };
 
