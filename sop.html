@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Rental SOP & Payment | Kodak Rental</title>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <style>
@@ -181,7 +182,14 @@
         </div>
     </div>
 
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    
     <script>
+        // MASUKKAN KREDENSIAL SUPABASE KAU DI SINI
+        const SUPABASE_URL = "https://udoncfzvxixbmjwkogew.supabase.co"; // URL Supabase kau
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVkb25jZnp2eGl4Ym1qd2tvZ2V3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk4OTIzNjYsImV4cCI6MjA5NTQ2ODM2Nn0.dH7XDMhJMDaygZDL_rGU72wK2BU_QjiMJ-Iu0kcZ0jw"; // KEY kau yang panjang tu
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
         // --- MODAL GUIDE LOGIC ---
         const modal = document.getElementById('guideModal');
         function showGuide() { modal.style.display = 'flex'; }
@@ -197,9 +205,7 @@
             canvas.getContext("2d").scale(ratio, ratio);
         }
 
-        const signaturePad = new SignaturePad(canvas, {
-            penColor: "rgb(2, 6, 23)"
-        });
+        const signaturePad = new SignaturePad(canvas, { penColor: "rgb(2, 6, 23)" });
 
         // --- UI LOGIC ---
         function toggleSections() {
@@ -210,12 +216,7 @@
             if (isAgreed) {
                 sections.classList.add('show');
                 submitBtn.classList.add('active');
-                
-                // Pembetulan pepijat lukisan: Refresh saiz canvas selepas element dipaparkan
-                setTimeout(() => {
-                    resizeCanvas();
-                    signaturePad.clear();
-                }, 150); 
+                setTimeout(() => { resizeCanvas(); signaturePad.clear(); }, 150); 
             } else {
                 sections.classList.remove('show');
                 submitBtn.classList.remove('active');
@@ -232,7 +233,6 @@
             }
         }
 
-        // Helper to convert files to Base64
         const toBase64 = file => new Promise((resolve, reject) => {
             const reader = new FileReader();
             reader.readAsDataURL(file);
@@ -250,29 +250,48 @@
             if (receiptInput.files.length === 0) { alert("Sila muat naik Resit Pembayaran."); return; }
             if (signaturePad.isEmpty()) { alert("Sila tandatangan di ruangan yang disediakan."); return; }
 
-            // Lock button & show loading state
             submitBtn.style.opacity = "0.7";
             submitBtn.style.pointerEvents = "none";
-            submitBtn.innerHTML = '<i class="ph ph-spinner ph-spin"></i> Menghantar ke Drive...';
+            submitBtn.innerHTML = '<i class="ph ph-spinner ph-spin"></i> Menghantar ke Sistem...';
 
             try {
-                // Convert gambar ke teks Base64
+                // 1. Ambil ID tempahan dari URL
+                const urlParams = new URLSearchParams(window.location.search);
+                const bookingId = urlParams.get('id');
+
+                let customerName = "Pelanggan Direct";
+                let dates = "N/A";
+                let times = "N/A";
+                let location = "N/A";
+
+                // 2. Tarik Maklumat Penuh dari Supabase (supaya masuk dalam PDF)
+                if(bookingId) {
+                    const { data, error } = await supabaseClient.from('bookings').select('*').eq('id', bookingId).single();
+                    if(data) {
+                        customerName = data.customer_name;
+                        dates = `${data.start_date} hingga ${data.end_date}`;
+                        times = `Ambil: ${data.pickup_time} | Pulang: ${data.return_time}`;
+                        location = data.location;
+                    }
+                }
+
+                // 3. Convert gambar ke Base64
                 const icBase64 = await toBase64(icInput.files[0]);
                 const receiptBase64 = await toBase64(receiptInput.files[0]);
                 const signatureBase64 = signaturePad.toDataURL();
 
-                // Ambil ID tempahan dari URL pautan
-                const urlParams = new URLSearchParams(window.location.search);
-                const bookingId = urlParams.get('id') || "Manual_Direct";
-
                 const payload = {
-                    bookingId: bookingId,
+                    bookingId: bookingId || "Manual_Direct",
+                    customerName: customerName,
+                    dates: dates,
+                    times: times,
+                    location: location,
                     ic: icBase64,
                     receipt: receiptBase64,
                     signature: signatureBase64
                 };
 
-                // URL WEB APP GOOGLE APPS SCRIPT KAU YANG REAL
+                // WEB APP URL KAU
                 const GAS_URL = "https://script.google.com/macros/s/AKfycbyWG73KcBNUZyTrBVhjecgBKsO8Z_kZ2KmNn4LtBnpXPdNJyJMpHsJhp-dqoae2xSM4FA/exec";
 
                 const response = await fetch(GAS_URL, {
@@ -283,15 +302,15 @@
                 const result = await response.json();
                 
                 if(result.status === "success") {
-                    alert("Berjaya! Dokumen Perjanjian dan Resit anda telah selamat disimpan ke Google Drive. Sila maklumkan kepada admin di WhatsApp untuk penyerahan kamera.");
+                    alert("Berjaya! Perjanjian PDF dan Resit anda telah dijana & disimpan. Sila maklumkan kepada admin di WhatsApp untuk tindakan lanjut.");
                     window.location.href = "index.html"; 
                 } else {
-                    alert("Ralat sistem Google: " + result.message);
+                    alert("Ralat Penjanaan PDF: " + result.message);
                     resetBtn(submitBtn);
                 }
 
             } catch (error) {
-                alert("Ralat sambungan server. Sila pastikan Apps Script anda di-deploy sebagai 'Anyone'.");
+                alert("Ralat sambungan. Sila cuba lagi.");
                 resetBtn(submitBtn);
             }
         }
