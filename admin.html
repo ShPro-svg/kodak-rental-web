@@ -3,54 +3,67 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard | Kodak Rental</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <title>Admin Dashboard | RentACam MY</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
     <style>
         :root {
+            /* TEMA WARNA RENTACAM MY */
+            --brand-main: #004DC0;    /* Tech Blue */
+            --brand-light: #D8ECF9;   /* Ice Blue */
+            --brand-dark: #0E1334;    /* Sapphire */
+            
             --bg-base: #F4F4F5;
-            --primary-dark: #0A2E4A;
-            --accent-green: #DDF3CF;
-            --brand-blue: #2C7FFF;
-            --text-main: #020617;
+            --primary-dark: #0A0A0A;  /* Rich Black */
+            --text-main: #0A0A0A;
             --border-strong: #E4E4E7;
+            --success-bg: #D1FAE5;
+            --success-text: #065F46;
         }
-        body { font-family: 'Poppins', sans-serif; background: var(--bg-base); padding: 15px; color: var(--text-main); display: none; /* Hidden until auth check */ }
+        
+        body { font-family: 'Poppins', sans-serif; background: var(--bg-base); padding: 15px; color: var(--text-main); display: none; }
         .container { max-width: 1000px; margin: 0 auto; padding-bottom: 40px; }
         
-        /* Header & Logout */
-        .admin-header { display: flex; justify-content: space-between; align-items: center; background: white; padding: 15px 20px; border-radius: 16px; border: 1px solid var(--border-strong); margin-bottom: 25px; }
-        .admin-header h2 { font-size: 1.3rem; display: flex; align-items: center; gap: 10px; color: var(--primary-dark); margin: 0; }
-        .btn-logout { background: #FEE2E2; color: #991B1B; border: none; padding: 8px 15px; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.8rem; display: flex; align-items: center; gap: 6px; }
+        /* HEADER & LOGOUT */
+        .admin-header { display: flex; justify-content: space-between; align-items: center; background: white; padding: 20px; border-radius: 20px; border: 1px solid var(--border-strong); margin-bottom: 25px; box-shadow: 0 4px 15px rgba(10,10,10,0.02);}
+        .admin-header h2 { font-size: 1.4rem; display: flex; align-items: center; gap: 10px; color: var(--brand-main); margin: 0; font-weight: 800; letter-spacing: -0.5px;}
+        .btn-logout { background: #FEE2E2; color: #991B1B; border: none; padding: 10px 16px; border-radius: 12px; cursor: pointer; font-weight: 600; font-size: 0.85rem; display: flex; align-items: center; gap: 6px; transition: 0.2s;}
+        .btn-logout:hover { background: #FECACA; }
 
+        /* STATS GRID */
         .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px; }
-        .stat-card { background: white; padding: 20px; border-radius: 20px; border: 1px solid var(--border-strong); }
-        .stat-card span { font-size: 0.8rem; color: #52525C; text-transform: uppercase; font-weight: 600; }
-        .stat-card h2 { font-size: 1.5rem; color: var(--brand-blue); margin-top: 5px; }
+        .stat-card { background: white; padding: 25px; border-radius: 20px; border: 1px solid var(--border-strong); box-shadow: 0 4px 15px rgba(10,10,10,0.02);}
+        .stat-card span { font-size: 0.8rem; color: #52525C; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;}
+        .stat-card h2 { font-size: 1.8rem; color: var(--brand-main); margin-top: 8px; font-weight: 800;}
 
-        .card { background: white; border-radius: 24px; padding: 25px; border: 1px solid var(--border-strong); margin-bottom: 20px; overflow-x: auto; }
-        .card h3 { margin-bottom: 20px; display: flex; align-items: center; gap: 10px; color: var(--primary-dark); }
+        /* TABLE CARD */
+        .card { background: white; border-radius: 24px; padding: 25px; border: 1px solid var(--border-strong); overflow-x: auto; box-shadow: 0 4px 15px rgba(10,10,10,0.02);}
+        .card h3 { margin-bottom: 20px; display: flex; align-items: center; gap: 10px; color: var(--brand-dark); font-weight: 700;}
         
-        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; min-width: 700px; }
-        th { text-align: left; padding: 12px; border-bottom: 2px solid var(--bg-base); color: #52525C; }
-        td { padding: 15px 12px; border-bottom: 1px solid var(--bg-base); }
+        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; min-width: 750px; }
+        th { text-align: left; padding: 15px 12px; border-bottom: 2px solid var(--bg-base); color: #52525C; font-weight: 600; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.5px;}
+        td { padding: 15px 12px; border-bottom: 1px solid var(--bg-base); font-weight: 500;}
         
-        .status-badge { padding: 6px 12px; border-radius: 8px; font-size: 0.7rem; font-weight: 600; text-transform: uppercase; }
+        .status-badge { padding: 6px 12px; border-radius: 8px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; display: inline-block;}
         .status-pending { background: #FEF3C7; color: #92400E; }
-        .status-confirmed { background: var(--accent-green); color: #064E3B; }
+        .status-confirmed { background: var(--success-bg); color: var(--success-text); }
 
-        .btn-action { padding: 8px 12px; border-radius: 8px; border: none; cursor: pointer; font-size: 0.75rem; font-weight: 600; transition: 0.2s; }
-        .btn-approve { background: var(--brand-blue); color: white; margin-right: 5px; }
+        .btn-action { padding: 8px 14px; border-radius: 10px; border: none; cursor: pointer; font-size: 0.75rem; font-weight: 600; transition: 0.2s; margin-bottom: 5px;}
+        .btn-approve { background: var(--brand-main); color: white; margin-right: 5px; }
+        .btn-approve:hover { background: var(--brand-dark); }
         .btn-delete { background: #FEE2E2; color: #991B1B; }
-        .btn-sop { background: var(--primary-dark); color: white; text-decoration: none; display: inline-block; padding: 8px 12px; border-radius: 8px; margin-top: 8px; font-size: 0.75rem; }
+        .btn-sop { background: var(--brand-light); color: var(--brand-main); text-decoration: none; display: inline-flex; align-items: center; gap: 5px; padding: 8px 14px; border-radius: 10px; margin-top: 5px; font-size: 0.75rem; font-weight: 700; border: 1px solid var(--brand-main);}
+        .btn-sop:hover { background: var(--brand-main); color: white; }
     </style>
 </head>
 <body>
     <div class="container">
         
         <div class="admin-header">
-            <h2><i class="ph-fill ph-shield-check"></i> Admin Panel</h2>
+            <h2><i class="ph-fill ph-camera"></i> RentACam MY</h2>
             <button class="btn-logout" onclick="handleLogout()">
                 <i class="ph ph-sign-out"></i> Logout
             </button>
@@ -68,65 +81,88 @@
         </div>
 
         <div class="card">
-            <h3><i class="ph ph-list-bullets"></i> Booking Requests</h3>
+            <h3><i class="ph-fill ph-list-bullets" style="color: var(--brand-main);"></i> Management Dashboard</h3>
             <table>
                 <thead>
                     <tr>
-                        <th>Customer</th>
-                        <th>Rental Dates</th>
-                        <th>Logistics</th>
+                        <th>Pelanggan</th>
+                        <th>Tarikh & Tempoh</th>
+                        <th>Kiraan Harga (Auto)</th>
                         <th>Status</th>
-                        <th>Actions</th>
+                        <th>Tindakan</th>
                     </tr>
                 </thead>
                 <tbody id="bookingTable">
-                    <tr><td colspan="5" style="text-align: center; color: #52525C; padding: 30px;">Connecting to database...</td></tr>
+                    <tr><td colspan="5" style="text-align: center; color: #52525C; padding: 40px;"><i class="ph ph-spinner ph-spin" style="font-size: 1.5rem;"></i> Menghubungkan pangkalan data...</td></tr>
                 </tbody>
             </table>
         </div>
     </div>
 
     <script>
-        // MASUKKAN KREDENSIAL SUPABASE KAU DI SINI
+        // MASUKKAN KREDENSIAL SUPABASE KAU
         const SUPABASE_URL = "https://udoncfzvxixbmjwkogew.supabase.co";
-        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVkb25jZnp2eGl4Ym1qd2tvZ2V3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk4OTIzNjYsImV4cCI6MjA5NTQ2ODM2Nn0.dH7XDMhJMDaygZDL_rGU72wK2BU_QjiMJ-Iu0kcZ0jw";
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVkb25jZnp2eGl4Ym1qd2tvZ2V3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk4OTIzNjYsImV4cCI6MjA5NTQ2ODM2Nn0.dH7XDMhJMDaygZDL_rGU72wK2BU_QjiMJ-Iu0kcZ0jw"; // Pastikan key ni betul
         
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // --- 1. SECURITY: CHECK AUTH SESSION ON LOAD ---
+        // --- 1. SECURITY AUTH ---
         async function checkAuth() {
             const { data: { session } } = await supabaseClient.auth.getSession();
-            
-            if (!session) {
-                // If not logged in, redirect to login page
-                window.location.href = "login.html";
-            } else {
-                // If logged in, show body and load data
-                document.body.style.display = "block";
-                loadAdmin();
-            }
+            if (!session) { window.location.href = "login.html"; } 
+            else { document.body.style.display = "block"; loadAdmin(); }
         }
 
-        // --- 2. LOGOUT FUNCTION ---
         async function handleLogout() {
             await supabaseClient.auth.signOut();
             window.location.href = "login.html";
         }
 
-        // --- 3. LOAD DATA & CALCULATE STATS ---
+        // --- 2. LOGIK KIRAAN HARGA DINAMIK RENTACAM MY ---
+        function calculatePrice(startStr, endStr) {
+            let current = new Date(startStr);
+            const end = new Date(endStr);
+            let days = 0;
+            let weekdays = 0;
+            let weekends = 0;
+
+            // Loop untuk setiap hari dalam tempoh sewaan
+            while(current <= end) {
+                const day = current.getDay(); // 0:Ahad, 5:Jumaat, 6:Sabtu
+                if(day === 0 || day === 5 || day === 6) { weekends++; } 
+                else { weekdays++; }
+                
+                current.setDate(current.getDate() + 1);
+                days++;
+            }
+
+            // Pakej Mingguan (7 Hari)
+            if (days >= 7) {
+                let weeks = Math.floor(days / 7);
+                let remainderDays = days % 7;
+                return (weeks * 100) + (remainderDays * 15);
+            } 
+            // Biasa
+            else {
+                let weekdayRate = (weekdays >= 4) ? 15 : 18;
+                return (weekdays * weekdayRate) + (weekends * 25);
+            }
+        }
+
+        // --- 3. LOAD DATA & BINA JADUAL ---
         async function loadAdmin() {
             const tableBody = document.getElementById('bookingTable');
-            tableBody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #52525C; padding: 30px;"><i class="ph ph-spinner ph-spin" style="font-size: 1.2rem; vertical-align: middle;"></i> Loading data...</td></tr>';
+            tableBody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #52525C; padding: 40px;"><i class="ph ph-spinner ph-spin" style="font-size: 1.5rem; vertical-align: middle;"></i> Memuat turun data...</td></tr>';
 
             const { data, error } = await supabaseClient.from('bookings').select('*').order('created_at', { ascending: false });
             
             if (error) {
-                tableBody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: #991B1B; padding: 30px;">Error connecting to database: ${error.message}</td></tr>`;
+                tableBody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: #991B1B; padding: 30px;">Ralat Pangkalan Data: ${error.message}</td></tr>`;
                 return;
             }
 
             if(!data || data.length === 0) {
-                tableBody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #52525C; padding: 30px;">No bookings found in database.</td></tr>';
+                tableBody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #52525C; padding: 40px; font-weight: 500;">Tiada rekod tempahan dijumpai.</td></tr>';
                 document.getElementById('totalIncome').innerText = `RM 0.00`;
                 document.getElementById('activeCount').innerText = 0;
                 return;
@@ -134,36 +170,41 @@
 
             let income = 0;
             let active = 0;
-            tableBody.innerHTML = ''; // Clear loading row
+            tableBody.innerHTML = ''; 
 
             data.forEach(b => {
                 const start = new Date(b.start_date);
                 const end = new Date(b.end_date);
-                const diffDays = Math.ceil(Math.abs(end - start) / (1000 * 60 * 60 * 24)) || 1;
+                const diffDays = Math.ceil(Math.abs(end - start) / (1000 * 60 * 60 * 24)) + 1; 
                 
-                // Pengiraan harga ikut hari
-                let rate = 25;
-                if (diffDays >= 7) rate = 15;
-                else if (diffDays >= 4) rate = 20;
-                
-                const totalPrice = (rate * diffDays) + 20; // Sewa + Deposit
+                // Panggil fungsi kiraan harga
+                const rentalPrice = calculatePrice(b.start_date, b.end_date);
 
                 if (b.status === 'confirmed') {
-                    income += (rate * diffDays); // Kira untung sewa sahaja
+                    income += rentalPrice; 
                     active++;
                 }
 
                 tableBody.innerHTML += `
                     <tr>
-                        <td><strong>${b.customer_name}</strong></td>
-                        <td>${b.start_date} <br>to<br> ${b.end_date} <br><small>(${diffDays} days)</small></td>
-                        <td><small>Pick: ${b.pickup_time}<br>Ret: ${b.return_time}<br>Loc: ${b.location}</small></td>
+                        <td>
+                            <strong style="color: var(--primary-dark); font-size: 0.95rem;">${b.customer_name}</strong><br>
+                            <span style="color: var(--text-secondary); font-size: 0.75rem;">ID: ${b.id.slice(0,6).toUpperCase()}</span>
+                        </td>
+                        <td>
+                            ${b.start_date} <i class="ph-bold ph-arrow-right" style="color: var(--brand-main); font-size: 0.75rem;"></i> ${b.end_date} <br>
+                            <span style="display:inline-block; background: var(--brand-light); color: var(--brand-dark); padding: 4px 8px; border-radius: 6px; font-size: 0.7rem; font-weight: 700; margin-top: 5px;">${diffDays} Hari</span>
+                        </td>
+                        <td>
+                            <strong style="font-size: 1rem; color: var(--brand-main);">Sewa: RM ${rentalPrice}</strong><br>
+                            <small style="color: var(--text-secondary); font-weight: 600;">+ Deposit: RM 20</small>
+                        </td>
                         <td><span class="status-badge status-${b.status}">${b.status}</span></td>
                         <td>
-                            ${b.status === 'pending' ? `<button class="btn-action btn-approve" onclick="updateStatus('${b.id}', 'confirmed')">Approve</button>` : ''}
-                            <button class="btn-action btn-delete" onclick="deleteBooking('${b.id}')">Delete</button>
+                            ${b.status === 'pending' ? `<button class="btn-action btn-approve" onclick="updateStatus('${b.id}', 'confirmed')"><i class="ph-bold ph-check"></i> Approve</button>` : ''}
+                            <button class="btn-action btn-delete" onclick="deleteBooking('${b.id}')"><i class="ph-bold ph-trash"></i></button>
                             <br>
-                            <a href="sop.html?id=${b.id}&price=${totalPrice}" target="_blank" class="btn-sop">View Customer Link</a>
+                            <a href="sop.html?id=${b.id}" target="_blank" class="btn-sop"><i class="ph-fill ph-link"></i> View T&C Link</a>
                         </td>
                     </tr>
                 `;
@@ -180,14 +221,13 @@
         }
 
         async function deleteBooking(id) {
-            if(confirm("Are you sure you want to delete this booking request? This cannot be undone.")) {
+            if(confirm("Padam tempahan ini secara kekal? Tindakan ini tidak boleh diundur.")) {
                 const { error } = await supabaseClient.from('bookings').delete().eq('id', id);
                 if (error) alert("Error deleting booking: " + error.message);
                 loadAdmin();
             }
         }
 
-        // Run auth check immediately
         checkAuth();
     </script>
 </body>
