@@ -3,82 +3,97 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Rental SOP & Payment | Kodak Rental</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <title>Rental SOP & Payment | RentACam MY</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/signature_pad@4.0.0/dist/signature_pad.umd.min.js"></script>
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    
     <style>
         :root {
+            /* TEMA WARNA RASMI RENTACAM MY */
+            --brand-main: #004DC0;    /* Tech Blue */
+            --brand-light: #D8ECF9;   /* Ice Blue */
+            --brand-dark: #0E1334;    /* Sapphire */
+            
             --bg-white: #FFFFFF;
             --bg-base: #F4F4F5;
-            --text-primary: #020617;
+            --text-primary: #0A0A0A;  /* Rich Black */
             --text-secondary: #52525C;
             --border-strong: #E4E4E7;
-            --brand-base: #2C7FFF;
-            --brand-subtle: #DBEAFE;
-            --highlight-green: #DDF3CF;
+            --highlight-green: #10b981;
         }
+
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; -webkit-tap-highlight-color: transparent; }
-        body { background-color: var(--bg-white); color: var(--text-primary); min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 15px 15px 40px; }
-        .app-wrapper { width: 100%; max-width: 500px; display: flex; flex-direction: column; gap: 20px; }
+        body { background-color: var(--bg-base); color: var(--text-primary); min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 15px 15px 40px; }
+        .app-wrapper { width: 100%; max-width: 550px; display: flex; flex-direction: column; gap: 20px; }
+        
         .header { text-align: center; padding: 10px 0 10px; }
-        .header h1 { font-size: 1.5rem; font-weight: 700; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .header h1 { font-size: 1.8rem; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 8px; color: var(--brand-main); letter-spacing: -0.5px;}
 
-        .card { background: var(--bg-white); border: 1px solid var(--border-strong); border-radius: 20px; padding: 25px; box-shadow: 0 4px 20px rgba(2, 6, 23, 0.03); }
+        .card { background: var(--bg-white); border: 1px solid var(--border-strong); border-radius: 24px; padding: 25px; box-shadow: 0 4px 20px rgba(10, 10, 10, 0.04); position: relative; }
+        .card h2 { font-size: 1.1rem; font-weight: 700; display: flex; align-items: center; gap: 8px; margin: 0; color: var(--brand-dark); }
         .card-header-flex { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        .card h2 { font-size: 1.1rem; font-weight: 600; display: flex; align-items: center; gap: 8px; margin: 0; }
         
-        /* Terms Scroll Box */
-        .terms-box { height: 250px; overflow-y: scroll; border: 1px solid var(--border-strong); padding: 15px; font-size: 0.8rem; border-radius: 12px; background: #FAFAFA; margin-bottom: 15px; line-height: 1.6; text-align: justify;}
-        .terms-box h4 { margin-top: 15px; margin-bottom: 5px; color: var(--brand-base); font-weight: 600;}
-        .terms-box h4:first-child { margin-top: 0; }
-        
-        .checkbox-container { display: flex; align-items: center; gap: 10px; font-size: 0.9rem; font-weight: 600; background: var(--brand-subtle); padding: 15px; border-radius: 12px; color: #1E3A8A; cursor: pointer; transition: 0.2s;}
-        .checkbox-container:active { transform: scale(0.98); }
-        .checkbox-container input { width: 18px; height: 18px; cursor: pointer; }
+        /* LANGUAGE TOGGLE */
+        .lang-toggle { position: absolute; top: 20px; right: 20px; display: flex; gap: 5px; background: var(--bg-base); padding: 4px; border-radius: 10px; border: 1px solid var(--border-strong);}
+        .lang-btn { border: none; padding: 5px 12px; border-radius: 7px; font-size: 0.75rem; font-weight: 700; cursor: pointer; transition: 0.2s; background: transparent; color: var(--text-secondary);}
+        .lang-btn.active { background: var(--brand-main); color: var(--bg-white); }
 
-        /* Payment Section */
-        .payment-flex { display: flex; gap: 15px; align-items: center; background: #020617; color: white; padding: 20px; border-radius: 16px; margin-bottom: 20px; }
-        .payment-text { flex: 1; }
-        .payment-text h3 { margin: 0 0 5px 0; font-size: 1.1rem; }
-        .payment-text p { margin: 0; font-size: 0.8rem; opacity: 0.8; line-height: 1.4; }
-        .payment-text .acc-no { font-size: 1.4rem; font-weight: 700; letter-spacing: 1px; margin: 8px 0; color: var(--highlight-green); }
+        /* TERMS SCROLL BOX */
+        .terms-box { height: 380px; overflow-y: scroll; border: 1px solid var(--border-strong); padding: 15px; font-size: 0.8rem; border-radius: 16px; background: #FAFAFA; margin: 25px 0 15px; line-height: 1.6; text-align: justify; }
+        .terms-content { display: none; animation: fadeIn 0.3s; }
+        .terms-content.active { display: block; }
+        .terms-box p { margin-bottom: 12px; color: var(--text-primary); }
+        .terms-box strong { color: var(--brand-main); font-weight: 700; display: block; margin-top: 10px; margin-bottom: 4px; font-size: 0.85rem;}
+        .terms-box strong:first-child { margin-top: 0; }
         
-        .payment-qr { width: 100px; height: 100px; background: white; border-radius: 12px; padding: 5px; display: flex; align-items: center; justify-content: center; overflow: hidden;}
+        .checkbox-container { display: flex; align-items: center; gap: 10px; font-size: 0.85rem; font-weight: 600; background: var(--brand-light); padding: 15px; border-radius: 12px; color: var(--brand-dark); cursor: pointer; transition: 0.2s; border: 1px solid var(--brand-main);}
+        .checkbox-container:active { transform: scale(0.98); }
+        .checkbox-container input { width: 18px; height: 18px; cursor: pointer; accent-color: var(--brand-main); }
+
+        /* PAYMENT SECTION */
+        .payment-flex { display: flex; gap: 15px; align-items: center; background: var(--brand-dark); color: var(--bg-white); padding: 20px; border-radius: 16px; margin-bottom: 20px; box-shadow: 0 4px 15px rgba(10,10,10,0.1);}
+        .payment-text { flex: 1; }
+        .payment-text h3 { margin: 0 0 5px 0; font-size: 1.1rem; color: var(--brand-light);}
+        .payment-text p { margin: 0; font-size: 0.8rem; opacity: 0.9; line-height: 1.4; }
+        .payment-text .acc-no { font-size: 1.4rem; font-weight: 800; letter-spacing: 1px; margin: 8px 0; color: var(--highlight-green); }
+        
+        .payment-qr { width: 100px; height: 100px; background: var(--bg-white); border-radius: 12px; padding: 5px; display: flex; align-items: center; justify-content: center; overflow: hidden;}
         .payment-qr img { max-width: 100%; height: auto; display: block;}
 
-        /* Upload Area */
-        .upload-area { border: 2px dashed var(--border-strong); border-radius: 12px; padding: 20px; text-align: center; cursor: pointer; margin-bottom: 15px; transition: 0.2s; }
-        .upload-area:hover { border-color: var(--brand-base); background: #F8FAFF; }
-        .upload-area i.main-icon { font-size: 2rem; color: var(--brand-base); margin-bottom: 10px; display: inline-block;}
-        .upload-area p.main-text { margin: 0; font-size: 0.85rem; font-weight: 500; }
+        /* UPLOAD AREA */
+        .upload-area { border: 2px dashed var(--border-strong); border-radius: 16px; padding: 20px; text-align: center; cursor: pointer; margin-bottom: 15px; transition: 0.2s; background: #FAFAFA;}
+        .upload-area:hover { border-color: var(--brand-main); background: var(--brand-light); }
+        .upload-area i.main-icon { font-size: 2rem; color: var(--brand-main); margin-bottom: 10px; display: inline-block;}
+        .upload-area p.main-text { margin: 0; font-size: 0.85rem; font-weight: 600; color: var(--text-primary);}
         .file-name { font-size: 0.75rem; color: var(--text-secondary); margin-top: 5px; }
         
-        .btn-example { background: #E4E4E7; color: #52525C; border: none; padding: 6px 12px; border-radius: 8px; font-size: 0.75rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 5px;}
+        .btn-example { background: var(--border-strong); color: var(--text-primary); border: none; padding: 6px 12px; border-radius: 8px; font-size: 0.75rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 5px; transition: 0.2s;}
+        .btn-example:hover { background: var(--brand-light); color: var(--brand-main); }
         
-        #signature-pad { border: 1px solid var(--border-strong); border-radius: 12px; width: 100%; height: 200px; background: #FAFAFA; touch-action: none; margin-bottom: 10px; }
+        #signature-pad { border: 1px solid var(--border-strong); border-radius: 16px; width: 100%; height: 200px; background: #FAFAFA; touch-action: none; margin-bottom: 10px; }
         
-        .btn-submit { width: 100%; padding: 16px; background: var(--brand-base); color: white; border: none; border-radius: 12px; font-weight: 600; font-size: 1rem; cursor: pointer; transition: 0.2s; opacity: 0.5; pointer-events: none; display: flex; justify-content: center; align-items: center; gap: 8px;}
+        /* SUBMIT BUTTON */
+        .btn-submit { width: 100%; padding: 16px; background: var(--brand-main); color: var(--bg-white); border: none; border-radius: 16px; font-weight: 600; font-size: 1rem; cursor: pointer; transition: 0.2s; opacity: 0.5; pointer-events: none; display: flex; justify-content: center; align-items: center; gap: 8px;}
         .btn-submit.active { opacity: 1; pointer-events: auto; }
-        .btn-submit.active:active { transform: scale(0.98); }
+        .btn-submit.active:active { transform: scale(0.98); background: var(--brand-dark); }
         
         .hidden-section { display: none; }
         .hidden-section.show { display: block; animation: fadeIn 0.5s; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Guide Modal (Popup) */
-        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.8); backdrop-filter: blur(5px); justify-content: center; align-items: center; padding: 20px; }
-        .modal-content { background-color: white; padding: 20px; border-radius: 20px; max-width: 400px; width: 100%; text-align: center; position: relative; animation: zoomIn 0.3s; }
+        /* GUIDE MODAL (POPUP) */
+        .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(10,10,10,0.8); backdrop-filter: blur(5px); justify-content: center; align-items: center; padding: 20px; }
+        .modal-content { background-color: var(--bg-white); padding: 25px; border-radius: 24px; max-width: 400px; width: 100%; text-align: center; position: relative; animation: zoomIn 0.3s; }
         @keyframes zoomIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-        .modal-content img { max-width: 100%; height: auto; border-radius: 10px; border: 1px solid #eee; margin-top: 10px;}
-        .close-modal { position: absolute; top: 15px; right: 15px; font-size: 1.2rem; cursor: pointer; color: #999; }
-        .close-modal:hover { color: #333; }
+        .modal-content img { max-width: 100%; height: auto; border-radius: 12px; border: 1px solid var(--border-strong); margin-top: 10px;}
+        .close-modal { position: absolute; top: 15px; right: 20px; font-size: 1.5rem; cursor: pointer; color: var(--text-secondary); }
+        .close-modal:hover { color: var(--text-primary); }
 
         @media (max-width: 400px) {
             .payment-flex { flex-direction: column; text-align: center; padding: 15px; }
             .payment-text .acc-no { font-size: 1.2rem; }
-            .terms-box { height: 200px; }
         }
     </style>
 </head>
@@ -86,40 +101,110 @@
 
     <div class="app-wrapper">
         <div class="header">
-            <h1><i class="ph-fill ph-file-text"></i> SOP & Agreement</h1>
-            <p style="font-size: 0.8rem; color: var(--text-secondary);">Sila lengkapkan langkah di bawah untuk pengesahan</p>
+            <h1><i class="ph-fill ph-file-text"></i> Rental Agreement</h1>
         </div>
 
         <div class="card">
-            <h2>1. Baca & Setuju Terma</h2>
+            <div class="lang-toggle">
+                <button class="lang-btn active" onclick="setLang('en')" id="btn-en">EN</button>
+                <button class="lang-btn" onclick="setLang('bm')" id="btn-bm">BM</button>
+            </div>
+            <h2>1. Terms & Conditions</h2>
+            
             <div class="terms-box">
-                <h4>📸 TERMA & SYARAT (T&C) RASMI SEWAAN DIGICAM KODAK</h4>
-                <p><strong>1. Harga Sewaan & Pakej</strong><br>Kadar Sewa: 1-3 Hari (RM25/hari), 4-6 Hari (RM20/hari), 7+ Hari (RM15/day). Pakej Termasuk: Kamera, Bateri, SD Card, Reader, Strap, Pouch. Deposit Keselamatan: RM20 (Refund penuh jika pulang baik).</p>
-                <p><strong>2. Tempahan & Pembatalan</strong><br>Booking sah selepas bayaran penuh (Sewa+Deposit). First Pay First Serve. Pembatalan >24jam refund penuh, <24jam deposit burn.</p>
-                <p><strong>3. Dokumen (Wajib)</strong><br>Hantar gambar Kad Matrik/IC depan (Palang: UNTUK SEWAAN DIGICAM SAHAJA). Sulit.</p>
-                <p><strong>4. Pickup & Return</strong><br>Lewat Pulang: Denda RM5 setiap jam lewat. Sila maklum awal.</p>
-                <p><strong>5. Ganti Rugi</strong><br>TIDAK kalis air. Rosak aksesori tolak deposit (Reader RM15, Bateri/SD RM25). Rosak Kritikal/Hilang: Ganti harga pasaran (RM300).</p>
-                <p><strong>6. Privasi</strong><br>Wajib transfer gambar sendiri. Kad akan di-format selepas pulang.</p>
-                <hr style="margin:15px 0; border:0; border-top:1px dashed #ddd;">
-                <h4>📸 OFFICIAL TERMS & CONDITIONS (English)</h4>
-                <p><strong>1. Rates</strong>: 1-3 Days (RM25/day), 4-6 Days (RM20/day), 7+ Days (RM15/day). RM20 refundable deposit.</p>
-                <p><strong>2. Booking</strong>: Confirmed upon full payment. Cancel >24h full refund, <24h deposit forfeited.</p>
-                <p><strong>3. Docs</strong>: Student ID/IC required (Watermarked). Confidential.</p>
-                <p><strong>4. Return</strong>: Late penalty RM5/hour.</p>
-                <p><strong>5. Damage</strong>: NOT waterproof. Fees apply for lost accessories. Critical damage/loss bears market value replacement (RM300).</p>
-                <p><strong>6. Privacy</strong>: Transfer your files. SD card formatted upon return.</p>
+                <div id="terms-en" class="terms-content active">
+                    <p style="font-weight: 700; text-align: center; color: var(--brand-main); font-size: 0.85rem;">OFFICIAL KODAK DIGICAM RENTAL TERMS & CONDITIONS</p>
+                    
+                    <strong>1. RENTAL RATES & PACKAGE</strong>
+                    <p>• Weekdays (Monday - Thursday): RM18/day<br>
+                    • Weekdays (4 days and above): RM15/day<br>
+                    • Weekends (Friday - Sunday): RM25/day<br>
+                    • Weekly Package (7 consecutive days): RM100</p>
+                    <p>Rental Package Includes: 1x Kodak Camera, 1x Battery, 1x SD Card, 1x SD Card Reader (Type-C / Lightning), 1x Hand Strap, 1x Camera Pouch / Bag.</p>
+                    <p>Security Deposit: A refundable security deposit of RM20 is required for every rental. The deposit will be fully refunded once the camera and all accessories are returned in good working condition, complete, and without damage.</p>
+                    
+                    <strong>2. BOOKING CONFIRMATION & CANCELLATION POLICY</strong>
+                    <p>Booking Confirmation: A booking is only confirmed upon receipt of full payment. Bookings operate on a First Pay, First Serve basis.</p>
+                    <p>Cancellation Policy:<br>
+                    • More than 24 hours before the rental period: 100% refund.<br>
+                    • Less than 24 hours before the rental period: The RM20 deposit is non-refundable, while the rental fee will be refunded.</p>
+                    
+                    <strong>3. SECURITY DOCUMENTS (MANDATORY)</strong>
+                    <p>For security and record-keeping purposes, renters must provide one of the following: Student ID Card; or Front side of National Identity Card (IC). The document must be crossed and marked with: "FOR DIGICAM RENTAL PURPOSE ONLY". All submitted documents will remain confidential and will only be used in cases involving loss, theft, or rental-related disputes.</p>
+                    
+                    <strong>4. PICK-UP & RETURN</strong>
+                    <p>Pick-Up: The condition of the camera and all accessories will be inspected jointly by both the owner and renter during collection.</p>
+                    <p>Return: The renter must return the camera on the agreed date and time.</p>
+                    <p>Late Return Fee: A late fee of RM5 per hour will be charged for any delay. If the renter anticipates any delay, they must notify the owner as soon as possible. Waiving of late fees is subject to the owner's discretion and dependent on future booking availability.</p>
+                    
+                    <strong>5. DAMAGE, LOSS & LIABILITY</strong>
+                    <p>Camera Care: This camera is not waterproof and must not be exposed to water, sand, excessive impact, or any conditions that may cause damage through negligence.</p>
+                    <p>Loss or Damage of Accessories: Replacement costs will first be deducted from the security deposit. If replacement costs exceed the RM20 deposit, the renter agrees to pay the remaining balance.<br>
+                    Replacement Charges: SD Card Reader: RM15 | Battery: RM25 | SD Card: RM25.</p>
+                    <p>Critical Damage or Loss of Camera: In the event of loss of the camera, theft due to renter negligence, or severe damage rendering the camera unusable, the renter agrees to bear the full repair cost or replacement cost based on the current market value (Camera Value: ~RM300).</p>
+                    
+                    <strong>6. RENTER'S RESPONSIBILITY DURING RENTAL PERIOD</strong>
+                    <p>The renter is fully responsible for the camera and all rented accessories throughout the entire rental period, from the moment of collection until they are returned to the owner. If the camera or accessories are lent, shared, transferred, used, or held by any third party including friends, family members, partners, or any other individual, the original renter shall remain fully responsible for any loss, theft, damage, late return, or any issues arising from the use of the rented equipment. The owner will only deal with the renter named in this agreement and shall not be responsible for pursuing claims against any third party who used the rented equipment.</p>
+                    
+                    <strong>7. FILE MANAGEMENT & PRIVACY</strong>
+                    <p>The renter is responsible for transferring all photos and videos to their own device before returning the camera. Upon return, the memory card will be fully formatted. No copies of photos or videos will be retained by the owner. The owner shall not be responsible for any data loss resulting from files not transferred before the camera is returned.</p>
+                    
+                    <strong>8. RENTER'S ACKNOWLEDGEMENT</strong>
+                    <p>I hereby confirm that all information provided is accurate and truthful. I have read and understood all terms and conditions stated in this agreement. I agree to comply with all rental policies, requirements, and to bear any costs arising from damage, loss, theft, or late return as specified in this agreement.</p>
+                </div>
+
+                <div id="terms-bm" class="terms-content">
+                    <p style="font-weight: 700; text-align: center; color: var(--brand-main); font-size: 0.85rem;">TERMA & SYARAT RASMI SEWAAN DIGICAM KODAK</p>
+                    
+                    <strong>1. KADAR SEWAAN & PAKEJ</strong>
+                    <p>• Hari Biasa (Isnin - Khamis): RM18/hari<br>
+                    • Hari Biasa (4 hari dan ke atas): RM15/hari<br>
+                    • Hujung Minggu (Jumaat - Ahad): RM25/hari<br>
+                    • Pakej Mingguan (7 hari berturut-turut): RM100</p>
+                    <p>Pakej Sewaan Termasuk: 1x Kamera Kodak, 1x Bateri, 1x Kad SD, 1x Pembaca Kad SD (Type-C / Lightning), 1x Tali Tangan, 1x Pouch / Beg Kamera.</p>
+                    <p>Deposit Keselamatan: Deposit keselamatan sebanyak RM20 diperlukan untuk setiap sewaan. Deposit akan dipulangkan sepenuhnya sebaik sahaja kamera dan semua aksesori dipulangkan dalam keadaan baik, lengkap, dan tanpa sebarang kerosakan.</p>
+                    
+                    <strong>2. PENGESAHAN TEMPAHAN & POLISI PEMBATALAN</strong>
+                    <p>Pengesahan Tempahan: Tempahan hanya disahkan setelah bayaran penuh diterima. Tempahan beroperasi mengikut prinsip 'First Pay, First Serve'.</p>
+                    <p>Polisi Pembatalan:<br>
+                    • Lebih 24 jam sebelum tempoh sewaan: Pulangan penuh 100%.<br>
+                    • Kurang 24 jam sebelum tempoh sewaan: Deposit RM20 tidak akan dipulangkan, manakala yuran sewaan akan dikembalikan.</p>
+                    
+                    <strong>3. DOKUMEN KESELAMATAN (WAJIB)</strong>
+                    <p>Untuk tujuan keselamatan dan rekod, penyewa mesti menyediakan salah satu daripada berikut: Kad ID Pelajar (Kad Matrik); atau Gambar bahagian depan Kad Pengenalan (IC). Dokumen tersebut mestilah dipalang dan ditanda dengan: "UNTUK SEWAAN DIGICAM SAHAJA". Semua dokumen yang diserahkan adalah sulit dan hanya akan dirujuk jika berlaku kes kehilangan, kecurian, atau pertikaian sewaan.</p>
+                    
+                    <strong>4. PENGAMBILAN & PEMULANGAN</strong>
+                    <p>Pengambilan: Keadaan kamera dan semua aksesori akan diperiksa bersama oleh pemilik dan penyewa semasa sesi penyerahan.</p>
+                    <p>Pemulangan: Penyewa mesti memulangkan kamera pada tarikh dan masa yang telah dipersetujui.</p>
+                    <p>Yuran Kelewatan: Caj lewat sebanyak RM5 sejam akan dikenakan untuk sebarang kelewatan. Jika penyewa menjangkakan sebarang kelewatan, mereka mesti memaklumkan pemilik secepat mungkin. Pengecualian yuran lewat adalah tertakluk kepada budi bicara pemilik dan bergantung pada ketersediaan tempahan seterusnya.</p>
+                    
+                    <strong>5. KEROSAKAN, KEHILANGAN & LIABILITI</strong>
+                    <p>Penjagaan Kamera: Kamera ini tidak kalis air dan tidak boleh didedahkan kepada air, pasir, impak terjatuh yang kuat, atau sebarang keadaan yang boleh menyebabkan kerosakan akibat kecuaian.</p>
+                    <p>Kehilangan atau Kerosakan Aksesori: Kos penggantian akan ditolak daripada deposit keselamatan terlebih dahulu. Jika kos melebihi deposit RM20, penyewa bersetuju untuk membayar baki tersebut.<br>
+                    Caj Penggantian: Pembaca Kad SD: RM15 | Bateri: RM25 | Kad SD: RM25.</p>
+                    <p>Kerosakan Kritikal atau Kehilangan Kamera: Jika berlaku kehilangan kamera, kecurian akibat kecuaian penyewa, atau kerosakan teruk yang menyebabkan kamera tidak dapat digunakan, penyewa bersetuju untuk menanggung kos pembaikan penuh atau kos penggantian berdasarkan nilai pasaran semasa (Nilai Kamera: ~RM300).</p>
+                    
+                    <strong>6. TANGGUNGJAWAB PENYEWA SEPANJANG TEMPOH SEWAAN</strong>
+                    <p>Penyewa bertanggungjawab sepenuhnya ke atas kamera dan semua aksesori yang disewa sepanjang tempoh sewaan, dari saat pengambilan sehingga ia dipulangkan kepada pemilik. Jika kamera atau aksesori dipinjamkan, dikongsi, dipindah milik, atau dipegang oleh mana-mana pihak ketiga termasuk rakan, ahli keluarga, pasangan, atau mana-mana individu lain, penyewa asal tetap bertanggungjawab sepenuhnya atas sebarang kehilangan, kecurian, kerosakan, kelewatan, atau sebarang isu yang timbul. Pemilik hanya akan berurusan dengan penyewa yang dinamakan dalam perjanjian ini dan tidak bertanggungjawab untuk menuntut ganti rugi daripada pihak ketiga.</p>
+                    
+                    <strong>7. PENGURUSAN FAIL & PRIVASI</strong>
+                    <p>Penyewa bertanggungjawab untuk memindahkan semua foto dan video ke peranti mereka sendiri sebelum memulangkan kamera. Selepas pemulangan, kad memori akan diformat sepenuhnya. Tiada salinan foto atau video akan disimpan oleh pemilik. Pemilik tidak akan bertanggungjawab atas sebarang kehilangan data akibat kegagalan memindahkan fail sebelum kamera dipulangkan.</p>
+                    
+                    <strong>8. PERAKUAN PENYEWA</strong>
+                    <p>Saya dengan ini mengesahkan bahawa semua maklumat yang diberikan adalah tepat dan benar. Saya telah membaca dan memahami semua terma dan syarat dalam perjanjian ini. Saya bersetuju untuk mematuhi semua polisi sewaan, keperluan, dan menanggung sebarang kos yang timbul akibat kerosakan, kehilangan, kecurian, atau kelewatan pemulangan seperti yang dinyatakan dalam perjanjian ini.</p>
+                </div>
             </div>
 
             <label class="checkbox-container">
                 <input type="checkbox" id="agreeBtn" onclick="toggleSections()">
-                Saya setuju dengan Terma di atas. (I agree)
+                <span id="agreeText">I agree to all terms stated above.</span>
             </label>
         </div>
 
         <div id="actionSections" class="hidden-section">
             
             <div class="card">
-                <h2>2. Pembayaran & Dokumen</h2>
+                <h2>2. Payment & Documents</h2>
                 
                 <div class="payment-flex">
                     <div class="payment-text">
@@ -132,26 +217,26 @@
                     </div>
                 </div>
 
-                <div class="form-group" style="margin-bottom: 25px; border-bottom: 1px solid #eee; padding-bottom: 20px;">
+                <div class="form-group" style="margin-bottom: 25px; border-bottom: 1px solid var(--border-strong); padding-bottom: 20px;">
                     <div class="card-header-flex">
-                        <label style="font-size:0.9rem; font-weight:600;"><i class="ph ph-identification-card" style="color:var(--brand-base);"></i> Upload IC / Student Card</label>
+                        <label style="font-size:0.9rem; font-weight:700; color: var(--brand-dark);"><i class="ph ph-identification-card" style="color:var(--brand-main);"></i> Upload IC / Student ID</label>
                         <button class="btn-example" onclick="showGuide()">
-                            <i class="ph ph-question"></i> Contoh Palang
+                            <i class="ph ph-question"></i> Guide
                         </button>
                     </div>
                     <div class="upload-area" onclick="document.getElementById('icInput').click()">
                         <i class="ph ph-camera main-icon"></i>
-                        <p class="main-text">Ambil Gambar / Upload</p>
+                        <p class="main-text">Take Photo / Upload</p>
                         <div id="icFileName" class="file-name">No file chosen</div>
                         <input type="file" id="icInput" accept="image/*" capture="environment" style="display:none" onchange="updateFileName('icInput', 'icFileName')">
                     </div>
                 </div>
 
                 <div class="form-group">
-                    <label style="font-size:0.9rem; font-weight:600; display:block; margin-bottom:10px;"><i class="ph ph-receipt" style="color:var(--brand-base);"></i> Upload Resit Bayaran</label>
+                    <label style="font-size:0.9rem; font-weight:700; color: var(--brand-dark); display:block; margin-bottom:10px;"><i class="ph ph-receipt" style="color:var(--brand-main);"></i> Upload Payment Receipt</label>
                     <div class="upload-area" onclick="document.getElementById('receiptInput').click()">
                         <i class="ph ph-file-arrow-up main-icon"></i>
-                        <p class="main-text">Pilih PDF / Gambar Resit</p>
+                        <p class="main-text">Select Image / PDF</p>
                         <div id="receiptFileName" class="file-name">No file chosen</div>
                         <input type="file" id="receiptInput" accept="image/*,application/pdf" style="display:none" onchange="updateFileName('receiptInput', 'receiptFileName')">
                     </div>
@@ -159,36 +244,56 @@
             </div>
 
             <div class="card">
-                <h2>3. Tandatangan Digital</h2>
-                <p style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 10px;">Sila tandatangan di dalam kotak di bawah (Guna jari)</p>
+                <h2>3. Digital Signature</h2>
+                <p style="font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 10px;">Please sign within the box below.</p>
                 <canvas id="signature-pad"></canvas>
-                <button onclick="signaturePad.clear()" style="font-size: 0.7rem; padding: 5px 10px; border-radius: 6px; border: 1px solid #ccc; cursor:pointer; background:white;">Clear Sign</button>
+                <button onclick="signaturePad.clear()" style="font-size: 0.75rem; padding: 6px 12px; border-radius: 8px; border: 1px solid var(--border-strong); cursor:pointer; background:var(--bg-white); font-weight: 600; color: var(--text-secondary); margin-top: 10px;">Clear Signature</button>
             </div>
 
             <button id="submitBtn" class="btn-submit" onclick="submitForm()">
-                <i class="ph ph-check-circle"></i>
-                <span>Hantar & Setuju Agreement</span>
+                <i class="ph-bold ph-check-circle"></i>
+                <span>Sign & Complete Agreement</span>
             </button>
         </div>
     </div>
 
     <div id="guideModal" class="modal">
         <div class="modal-content">
-            <span class="close-modal" onclick="hideGuide()"><i class="ph ph-x"></i></span>
-            <h3 style="color:var(--text-primary); font-size: 1rem;">Panduan Palang Dokumen</h3>
-            <p style="font-size: 0.75rem; color: var(--text-secondary); margin: 5px 0 10px;">Sila palang/watermark dokumen anda seperti contoh untuk keselamatan data.</p>
-            <img src="image_938d80.png" alt="Contoh Palang IC">
-            <button class="btn-submit active" style="margin-top:15px; padding: 12px; font-size: 0.9rem; background: var(--text-primary);" onclick="hideGuide()">Faham</button>
+            <span class="close-modal" onclick="hideGuide()"><i class="ph-bold ph-x"></i></span>
+            <h3 style="color:var(--brand-dark); font-size: 1.1rem; font-weight: 800;">Document Guide</h3>
+            <p style="font-size: 0.8rem; color: var(--text-secondary); margin: 5px 0 15px;">Please watermark your document as shown below for security.</p>
+            <img src="panduan.png" alt="Contoh Palang IC">
+            <button class="btn-submit active" style="margin-top:20px; padding: 14px; font-size: 0.9rem;" onclick="hideGuide()">I Understand</button>
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-    
+    let currentLang = "en";
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
         // MASUKKAN KREDENSIAL SUPABASE KAU DI SINI
-        const SUPABASE_URL = "https://udoncfzvxixbmjwkogew.supabase.co"; // URL Supabase kau
-        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVkb25jZnp2eGl4Ym1qd2tvZ2V3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk4OTIzNjYsImV4cCI6MjA5NTQ2ODM2Nn0.dH7XDMhJMDaygZDL_rGU72wK2BU_QjiMJ-Iu0kcZ0jw"; // KEY kau yang panjang tu
+        const SUPABASE_URL = "https://udoncfzvxixbmjwkogew.supabase.co";
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVkb25jZnp2eGl4Ym1qd2tvZ2V3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk4OTIzNjYsImV4cCI6MjA5NTQ2ODM2Nn0.dH7XDMhJMDaygZDL_rGU72wK2BU_QjiMJ-Iu0kcZ0jw";
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // --- LANGUAGE TOGGLE LOGIC ---
+        function setLang(lang) {
+            currentLang = lang; // Kunci data bahasa yang dipilih customer ke memori global
+            
+            document.getElementById('btn-en').classList.remove('active');
+            document.getElementById('btn-bm').classList.remove('active');
+            document.getElementById('btn-' + lang).classList.add('active');
+            
+            document.getElementById('terms-en').classList.remove('active');
+            document.getElementById('terms-bm').classList.remove('active');
+            document.getElementById('terms-' + lang).classList.add('active');
+
+            if(lang === 'bm') {
+                document.getElementById('agreeText').innerText = "Saya setuju dengan semua terma di atas.";
+            } else {
+                document.getElementById('agreeText').innerText = "I agree to all terms stated above.";
+            }
+        }
 
         // --- MODAL GUIDE LOGIC ---
         const modal = document.getElementById('guideModal');
@@ -205,7 +310,7 @@
             canvas.getContext("2d").scale(ratio, ratio);
         }
 
-        const signaturePad = new SignaturePad(canvas, { penColor: "rgb(2, 6, 23)" });
+        const signaturePad = new SignaturePad(canvas, { penColor: "rgb(10, 10, 10)" });
 
         // --- UI LOGIC ---
         function toggleSections() {
@@ -227,8 +332,8 @@
             const input = document.getElementById(inputId);
             const display = document.getElementById(displayId);
             if(input.files.length > 0) {
-                display.innerText = input.files[0].name;
-                display.style.color = "var(--brand-base)";
+                document.getElementById(displayId).innerText = input.files[0].name;
+                display.style.color = "var(--brand-main)";
                 display.style.fontWeight = "600";
             }
         }
@@ -252,10 +357,9 @@
 
             submitBtn.style.opacity = "0.7";
             submitBtn.style.pointerEvents = "none";
-            submitBtn.innerHTML = '<i class="ph ph-spinner ph-spin"></i> Menghantar ke Sistem...';
+            submitBtn.innerHTML = '<i class="ph ph-spinner ph-spin"></i> Processing...';
 
             try {
-                // 1. Ambil ID tempahan dari URL
                 const urlParams = new URLSearchParams(window.location.search);
                 const bookingId = urlParams.get('id');
 
@@ -264,18 +368,16 @@
                 let times = "N/A";
                 let location = "N/A";
 
-                // 2. Tarik Maklumat Penuh dari Supabase (supaya masuk dalam PDF)
                 if(bookingId) {
                     const { data, error } = await supabaseClient.from('bookings').select('*').eq('id', bookingId).single();
                     if(data) {
                         customerName = data.customer_name;
-                        dates = `${data.start_date} hingga ${data.end_date}`;
-                        times = `Ambil: ${data.pickup_time} | Pulang: ${data.return_time}`;
+                        dates = `${data.start_date} to ${data.end_date}`;
+                        times = `Pickup: ${data.pickup_time} | Return: ${data.return_time}`;
                         location = data.location;
                     }
                 }
 
-                // 3. Convert gambar ke Base64
                 const icBase64 = await toBase64(icInput.files[0]);
                 const receiptBase64 = await toBase64(receiptInput.files[0]);
                 const signatureBase64 = signaturePad.toDataURL();
@@ -288,10 +390,11 @@
                     location: location,
                     ic: icBase64,
                     receipt: receiptBase64,
-                    signature: signatureBase64
+                    signature: signatureBase64,
+                    lang: currentLang // KOD BARU: Menghantar data 'bm' atau 'en' terus ke Google Drive
                 };
 
-                // WEB APP URL KAU
+                // URL WEB APP GOOGLE APPS SCRIPT KAU
                 const GAS_URL = "https://script.google.com/macros/s/AKfycbyWG73KcBNUZyTrBVhjecgBKsO8Z_kZ2KmNn4LtBnpXPdNJyJMpHsJhp-dqoae2xSM4FA/exec";
 
                 const response = await fetch(GAS_URL, {
@@ -302,21 +405,21 @@
                 const result = await response.json();
                 
                 if(result.status === "success") {
-                    alert("Berjaya! Perjanjian PDF dan Resit anda telah dijana & disimpan. Sila maklumkan kepada admin di WhatsApp untuk tindakan lanjut.");
+                    alert("Success! Your agreement and receipt have been recorded. Please notify admin via WhatsApp.");
                     window.location.href = "index.html"; 
                 } else {
-                    alert("Ralat Penjanaan PDF: " + result.message);
+                    alert("System Error: " + result.message);
                     resetBtn(submitBtn);
                 }
 
             } catch (error) {
-                alert("Ralat sambungan. Sila cuba lagi.");
+                alert("Connection Error. Please try again.");
                 resetBtn(submitBtn);
             }
         }
 
         function resetBtn(btn) {
-            btn.innerHTML = '<i class="ph ph-check-circle"></i> Hantar & Setuju Agreement';
+            btn.innerHTML = '<i class="ph-bold ph-check-circle"></i> Sign & Complete Agreement';
             btn.style.pointerEvents = "auto";
             btn.style.opacity = "1";
         }

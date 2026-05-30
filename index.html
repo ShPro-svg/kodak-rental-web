@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>RentACam MY | UTM KL Digicam Rental</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <style>
+        :root {
+            /* TEMA WARNA RENTACAM MY */
+            --brand-main: #004DC0;    /* Tech Blue */
+            --brand-light: #D8ECF9;   /* Ice Blue */
+            --brand-dark: #0E1334;    /* Sapphire */
+            
+            --bg-white: #FFFFFF;      /* White */
+            --bg-base: #F4F4F5;       /* Light grey background */
+            --text-primary: #0A0A0A;  /* Rich Black */
+            --text-secondary: #52525C;
+            --border-strong: #E4E4E7;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; -webkit-tap-highlight-color: transparent; }
+        body { background-color: var(--bg-base); color: var(--text-primary); padding: 20px 15px 40px; display: flex; flex-direction: column; align-items: center; min-height: 100vh;}
+        
+        .app-wrapper { width: 100%; max-width: 500px; display: flex; flex-direction: column; gap: 20px; }
+        
+        /* HEADER */
+        .header { text-align: center; padding: 15px 0 5px; }
+        .header h1 { font-size: 2rem; font-weight: 800; color: var(--brand-main); letter-spacing: -0.5px; margin-bottom: 5px;}
+        .header p { font-size: 0.85rem; color: var(--text-secondary); font-weight: 500; }
+        .location-tag { display: inline-flex; align-items: center; gap: 6px; background: var(--brand-light); color: var(--brand-main); padding: 6px 14px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; margin-top: 10px; border: 1px solid var(--brand-main); }
+
+        /* CARD STYLE */
+        .card { background: var(--bg-white); border: 1px solid var(--border-strong); border-radius: 24px; padding: 24px; box-shadow: 0 4px 20px rgba(10, 10, 10, 0.04); }
+        .camera-img { width: 100%; border-radius: 16px; margin-bottom: 20px; border: 1px solid var(--border-strong); }
+        .card-title { font-size: 1.1rem; font-weight: 700; margin-bottom: 10px; display: flex; align-items: center; gap: 8px; color: var(--brand-dark); }
+
+        /* RATES TABLE */
+        .rates-table { width: 100%; border-collapse: collapse; margin: 15px 0; font-size: 0.85rem; }
+        .rates-table th { text-align: left; padding: 10px 0; color: var(--text-secondary); border-bottom: 2px solid var(--bg-base); font-weight: 600;}
+        .rates-table td { padding: 12px 0; border-bottom: 1px solid var(--bg-base); font-weight: 500;}
+        .price-tag { font-weight: 700; color: var(--brand-main); text-align: right; }
+
+        /* BUTTONS */
+        .btn-primary { width: 100%; padding: 16px; background: var(--brand-main); color: var(--bg-white); border: none; border-radius: 16px; font-size: 1rem; font-weight: 600; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 10px; transition: 0.2s; box-shadow: 0 4px 15px rgba(0, 77, 192, 0.15);}
+        .btn-primary:active { transform: scale(0.98); background: var(--brand-dark); }
+
+        /* TIRAI (ACCORDION) */
+        .tirai-wrapper { display: grid; grid-template-rows: 0fr; transition: 0.4s ease-out; }
+        .tirai-wrapper.open { grid-template-rows: 1fr; margin-top: 10px; }
+        .tirai-content { overflow: hidden; display: flex; flex-direction: column; gap: 20px; }
+        
+        /* CALENDAR CUSTOMIZATION */
+        .flatpickr-calendar { width: 100% !important; border-radius: 16px !important; box-shadow: none !important; border: 1px solid var(--border-strong) !important; padding: 10px; }
+        .flatpickr-day.selected, .flatpickr-day.startRange, .flatpickr-day.endRange { background: var(--brand-main) !important; border-color: var(--brand-main) !important; }
+        
+        /* FORM INPUTS */
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; font-size: 0.8rem; font-weight: 600; color: var(--text-primary); margin-bottom: 6px; }
+        input, select { width: 100%; padding: 14px; border-radius: 12px; border: 1px solid var(--border-strong); background: var(--bg-white); font-size: 0.9rem; outline: none; transition: 0.2s; -webkit-appearance: none; color: var(--text-primary);}
+        input:focus, select:focus { border-color: var(--brand-main); box-shadow: 0 0 0 3px var(--brand-light); }
+    </style>
+</head>
+<body>
+    <div class="app-wrapper">
+        
+        <div class="header">
+            <h1>RentACam MY</h1>
+            <p>Retro Vibes, Modern Booking</p>
+            <div class="location-tag"><i class="ph-fill ph-map-pin"></i> UTM KL & Sekitarnya Sahaja</div>
+        </div>
+
+        <div class="card">
+            <img src="kodak-fz55.png" class="camera-img" alt="Kodak Pixpro FZ55">
+            <h3 class="card-title"><i class="ph-fill ph-tag" style="color: var(--brand-main);"></i> Rental Rates</h3>
+            <table class="rates-table">
+                <thead>
+                    <tr>
+                        <th>Tempoh Sewaan</th>
+                        <th style="text-align: right;">Kadar</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr><td>Isnin - Khamis (Weekdays)</td><td class="price-tag">RM 18 / hari</td></tr>
+                    <tr><td>Weekdays (4 Hari & ke atas)</td><td class="price-tag">RM 15 / hari</td></tr>
+                    <tr><td>Jumaat - Ahad (Weekends)</td><td class="price-tag">RM 25 / hari</td></tr>
+                    <tr><td>Pakej Mingguan (7 Hari)</td><td class="price-tag">RM 100 nett</td></tr>
+                </tbody>
+            </table>
+            <p style="font-size: 0.75rem; color: var(--text-secondary); font-weight: 500; margin-top: 10px;">
+                <i class="ph-fill ph-info" style="color: var(--brand-main);"></i> Termasuk kamera, bateri, SD Card, reader, strap & pouch. Deposit sekuriti RM20 (Refundable).
+            </p>
+        </div>
+
+        <button class="btn-primary" id="btnToggle">
+            <i class="ph ph-calendar-check" style="font-size: 1.2rem;"></i> Check Availability & Book
+        </button>
+
+        <div class="tirai-wrapper" id="tirai">
+            <div class="tirai-content">
+                
+                <div class="card">
+                    <h3 class="card-title"><i class="ph-fill ph-calendar" style="color: var(--brand-main);"></i> Pilih Tarikh</h3>
+                    <input type="text" id="calendar" style="display:none;">
+                    
+                    <div style="margin-top:20px; background: var(--brand-light); padding: 15px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; border: 1px solid var(--brand-main);">
+                        <div>
+                            <span style="font-size:0.7rem; color: var(--brand-dark); font-weight:700; text-transform:uppercase;">Tarikh Pilihan</span>
+                            <div id="displayDates" style="font-size:0.85rem; font-weight:600; color: var(--text-primary);">Pilih di kalendar</div>
+                        </div>
+                        <div id="displayDays" style="font-weight:800; font-size:1.2rem; color: var(--brand-main);">0 Hari</div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3 class="card-title"><i class="ph-fill ph-user-circle" style="color: var(--brand-main);"></i> Butiran Penyewa</h3>
+                    <form id="bookingForm">
+                        <div class="form-group">
+                            <label>Nama Penuh (Mengikut IC/Matrik)</label>
+                            <input type="text" id="name" placeholder="Sila masukkan nama penuh" required>
+                        </div>
+                        
+                        <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom:15px;">
+                            <div class="form-group">
+                                <label>Waktu Ambil</label>
+                                <select id="pickup" required>
+                                    <option value="" disabled selected>Pilih Waktu</option>
+                                    <option value="10:00 AM">10:00 AM</option>
+                                    <option value="12:00 PM">12:00 PM</option>
+                                    <option value="2:00 PM">2:00 PM</option>
+                                    <option value="5:00 PM">5:00 PM</option>
+                                    <option value="8:00 PM">8:00 PM</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label>Waktu Pulang</label>
+                                <select id="return" required>
+                                    <option value="" disabled selected>Pilih Waktu</option>
+                                    <option value="10:00 AM">10:00 AM</option>
+                                    <option value="12:00 PM">12:00 PM</option>
+                                    <option value="2:00 PM">2:00 PM</option>
+                                    <option value="5:00 PM">5:00 PM</option>
+                                    <option value="8:00 PM">8:00 PM</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-group" style="margin-bottom: 25px;">
+                            <label>Lokasi Pertemuan (UTM KL & Sekitarnya)</label>
+                            <input type="text" id="location" placeholder="Cth: Pintu Utama UTM KL, Stesen LRT" required>
+                        </div>
+                        
+                        <button type="submit" class="btn-primary" style="background: var(--brand-dark); margin-top: 10px;">
+                            <i class="ph ph-whatsapp-logo" style="font-size: 1.2rem;"></i> Confirm via WhatsApp
+                        </button>
+                    </form>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script>
+        // MASUKKAN KREDENSIAL SUPABASE KAU DI SINI
+        const SUPABASE_URL = "https://udoncfzvxixbmjwkogew.supabase.co";
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVkb25jZnp2eGl4Ym1qd2tvZ2V3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk4OTIzNjYsImV4cCI6MjA5NTQ2ODM2Nn0.dH7XDMhJMDaygZDL_rGU72wK2BU_QjiMJ-Iu0kcZ0jw"; // Pastikan key kau dimasukkan!
+        
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        let totalDays = 0;
+        let startDateStr = '';
+        let endDateStr = '';
+        let fpInstance;
+
+        // Tarik tarikh booked dari Supabase
+        async function fetchBookedDates() {
+            try {
+                const { data, error } = await supabaseClient
+                    .from('bookings')
+                    .select('start_date, end_date')
+                    .eq('status', 'confirmed');
+
+                if (error) throw error;
+
+                const disabledRanges = data.map(booking => ({
+                    from: booking.start_date,
+                    to: booking.end_date
+                }));
+
+                fpInstance.set('disable', disabledRanges);
+            } catch (err) {
+                console.error("Gagal tarik kalendar:", err.message);
+            }
+        }
+
+        // Initialize Calendar
+        fpInstance = flatpickr("#calendar", {
+            inline: true, 
+            mode: "range", 
+            minDate: "today", 
+            dateFormat: "Y-m-d",
+            disable: [],
+            onChange: function(selectedDates) {
+                if(selectedDates.length === 2) {
+                    const diffTime = Math.abs(selectedDates[1] - selectedDates[0]);
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+                    
+                    totalDays = diffDays;
+                    startDateStr = selectedDates[0].toLocaleDateString('en-GB');
+                    endDateStr = selectedDates[1].toLocaleDateString('en-GB');
+                    
+                    document.getElementById('displayDates').innerText = `${startDateStr} - ${endDateStr}`;
+                    document.getElementById('displayDays').innerText = `${totalDays} Hari`;
+                } else {
+                    totalDays = 0;
+                    document.getElementById('displayDates').innerText = "Pilih di kalendar";
+                    document.getElementById('displayDays').innerText = "0 Hari";
+                }
+            }
+        });
+
+        fetchBookedDates();
+
+        // Toggle Tirai
+        document.getElementById('btnToggle').addEventListener('click', function() {
+            const tirai = document.getElementById('tirai');
+            const isOpen = tirai.classList.contains('open');
+            
+            if(isOpen) {
+                tirai.classList.remove('open');
+                this.innerHTML = '<i class="ph ph-calendar-check" style="font-size: 1.2rem;"></i> Check Availability & Book';
+                this.style.background = 'var(--brand-main)';
+            } else {
+                tirai.classList.add('open');
+                this.innerHTML = '<i class="ph ph-x" style="font-size: 1.2rem;"></i> Tutup Kalendar';
+                this.style.background = 'var(--text-secondary)';
+                
+                setTimeout(() => {
+                    fpInstance.redraw();
+                    tirai.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }, 300);
+            }
+        });
+
+        // Submit Form
+        document.getElementById('bookingForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            if(totalDays === 0) { alert("Sila pilih tarikh sewaan di kalendar terlebih dahulu."); return; }
+
+            const bookingData = {
+                customer_name: document.getElementById('name').value,
+                start_date: fpInstance.selectedDates[0].toISOString().split('T')[0],
+                end_date: fpInstance.selectedDates[1].toISOString().split('T')[0],
+                pickup_time: document.getElementById('pickup').value,
+                return_time: document.getElementById('return').value,
+                location: document.getElementById('location').value, // Ambil balik lokasi
+                status: 'pending'
+            };
+
+            const btnSubmit = this.querySelector('button[type="submit"]');
+            btnSubmit.innerHTML = '<i class="ph ph-spinner ph-spin"></i> Memproses...';
+            btnSubmit.style.pointerEvents = 'none';
+
+            const { data, error } = await supabaseClient.from('bookings').insert([bookingData]).select();
+
+            if (error) {
+                alert("Ralat sistem: " + error.message);
+                btnSubmit.innerHTML = '<i class="ph ph-whatsapp-logo"></i> Confirm via WhatsApp';
+                btnSubmit.style.pointerEvents = 'auto';
+            } else {
+                const bookingId = data[0].id;
+                // GANTIKAN NOMBOR WHATSAPP KAU DI SINI
+                const phoneNumber = "60123456789"; 
+                
+                const message = `Hi RentACam MY! 📸\n\nSaya telah membuat tempahan (ID: ${bookingId.slice(0,5)}). Tolong check maklumat saya di sistem. Terima kasih!`;
+
+                window.open(`https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`, '_blank');
+                
+                setTimeout(() => { window.location.reload(); }, 2000);
+            }
+        });
+    </script>
+</body>
+</html>
