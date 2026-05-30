@@ -17,8 +17,6 @@
             --brand-base: #2C7FFF;
             --brand-subtle: #DBEAFE;
             --highlight-green: #DDF3CF;
-            --status-booked-bg: #F4F4F5; 
-            --status-booked-text: #52525C; 
         }
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; -webkit-tap-highlight-color: transparent; }
         body { background-color: var(--bg-white); color: var(--text-primary); min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 15px 15px 40px; }
@@ -39,7 +37,7 @@
         .checkbox-container:active { transform: scale(0.98); }
         .checkbox-container input { width: 18px; height: 18px; cursor: pointer; }
 
-        /* Payment Section (New Layout) */
+        /* Payment Section */
         .payment-flex { display: flex; gap: 15px; align-items: center; background: #020617; color: white; padding: 20px; border-radius: 16px; margin-bottom: 20px; }
         .payment-text { flex: 1; }
         .payment-text h3 { margin: 0 0 5px 0; font-size: 1.1rem; }
@@ -48,9 +46,6 @@
         
         .payment-qr { width: 100px; height: 100px; background: white; border-radius: 12px; padding: 5px; display: flex; align-items: center; justify-content: center; overflow: hidden;}
         .payment-qr img { max-width: 100%; height: auto; display: block;}
-        /* Placeholder styling if qr-code.png is missing */
-        .payment-qr:empty { border: 2px dashed #444; background: #111; position: relative;}
-        .payment-qr:empty::after { content: "Upload qr-code.png"; color: #777; font-size: 0.6rem; text-align: center; position: absolute; padding: 5px;}
 
         /* Upload Area */
         .upload-area { border: 2px dashed var(--border-strong); border-radius: 12px; padding: 20px; text-align: center; cursor: pointer; margin-bottom: 15px; transition: 0.2s; }
@@ -170,7 +165,6 @@
             </div>
 
             <button id="submitBtn" class="btn-submit" onclick="submitForm()">
-                <i class="ph ph-spinner ph-spin" style="display:none;"></i>
                 <i class="ph ph-check-circle"></i>
                 <span>Hantar & Setuju Agreement</span>
             </button>
@@ -180,34 +174,28 @@
     <div id="guideModal" class="modal">
         <div class="modal-content">
             <span class="close-modal" onclick="hideGuide()"><i class="ph ph-x"></i></span>
-            <h3 style="color:var(--primary-dark); font-size: 1rem;">Panduan Palang Dokumen</h3>
+            <h3 style="color:var(--text-primary); font-size: 1rem;">Panduan Palang Dokumen</h3>
             <p style="font-size: 0.75rem; color: var(--text-secondary); margin: 5px 0 10px;">Sila palang/watermark dokumen anda seperti contoh untuk keselamatan data.</p>
-            <img src="panduan.jpg" alt="Contoh Palang IC">
-            <button class="btn-primary active" style="margin-top:15px; padding: 12px; font-size: 0.9rem;" onclick="hideGuide()">Faham</button>
+            <img src="image_938d80.png" alt="Contoh Palang IC">
+            <button class="btn-submit active" style="margin-top:15px; padding: 12px; font-size: 0.9rem; background: var(--text-primary);" onclick="hideGuide()">Faham</button>
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
-    
     <script>
         // --- MODAL GUIDE LOGIC ---
         const modal = document.getElementById('guideModal');
         function showGuide() { modal.style.display = 'flex'; }
         function hideGuide() { modal.style.display = 'none'; }
-        // Close modal if click outside content
         window.onclick = function(event) { if (event.target == modal) { hideGuide(); } }
 
         // --- SIGNATURE PAD LOGIC ---
         const canvas = document.getElementById("signature-pad");
-        // Adjust resolution for mobile
         function resizeCanvas() {
             const ratio =  Math.max(window.devicePixelRatio || 1, 1);
             canvas.width = canvas.offsetWidth * ratio;
             canvas.height = canvas.offsetHeight * ratio;
             canvas.getContext("2d").scale(ratio, ratio);
         }
-        window.onresize = resizeCanvas;
-        resizeCanvas();
 
         const signaturePad = new SignaturePad(canvas, {
             penColor: "rgb(2, 6, 23)"
@@ -223,12 +211,11 @@
                 sections.classList.add('show');
                 submitBtn.classList.add('active');
                 
-                // KOD BARU: Wajib resize canvas SELEPAS kotak ni muncul supaya boleh lukis
+                // Pembetulan pepijat lukisan: Refresh saiz canvas selepas element dipaparkan
                 setTimeout(() => {
                     resizeCanvas();
-                    signaturePad.clear(); // Bersihkan pad supaya ready
+                    signaturePad.clear();
                 }, 150); 
-                
             } else {
                 sections.classList.remove('show');
                 submitBtn.classList.remove('active');
@@ -241,37 +228,78 @@
             if(input.files.length > 0) {
                 display.innerText = input.files[0].name;
                 display.style.color = "var(--brand-base)";
+                display.style.fontWeight = "600";
             }
         }
 
-        // --- SUBMIT TO GOOGLE DRIVE LOGIC (Needs GAS Integration) ---
-        function submitForm() {
-            const icInput = document.getElementById('icInput').files.length;
-            const receiptInput = document.getElementById('receiptInput').files.length;
+        // Helper to convert files to Base64
+        const toBase64 = file => new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = error => reject(error);
+        });
+
+        // --- SUBMIT TO GOOGLE DRIVE ---
+        async function submitForm() {
+            const icInput = document.getElementById('icInput');
+            const receiptInput = document.getElementById('receiptInput');
             const submitBtn = document.getElementById('submitBtn');
 
-            if (icInput === 0) { alert("Sila muat naik IC / Kad Matrik."); showGuide(); return; }
-            if (receiptInput === 0) { alert("Sila muat naik Resit Pembayaran."); return; }
+            if (icInput.files.length === 0) { alert("Sila muat naik IC / Kad Matrik."); showGuide(); return; }
+            if (receiptInput.files.length === 0) { alert("Sila muat naik Resit Pembayaran."); return; }
             if (signaturePad.isEmpty()) { alert("Sila tandatangan di ruangan yang disediakan."); return; }
 
-            // Show loading state
+            // Lock button & show loading state
             submitBtn.style.opacity = "0.7";
             submitBtn.style.pointerEvents = "none";
-            submitBtn.querySelector('i.ph-spinner').style.display = 'inline-block';
-            submitBtn.querySelector('i.ph-check-circle').style.display = 'none';
-            submitBtn.querySelector('span').innerText = 'Menghantar ke Drive...';
+            submitBtn.innerHTML = '<i class="ph ph-spinner ph-spin"></i> Menghantar ke Drive...';
 
-            alert("Terima kasih! Maklumat dan pembayaran anda sedang diproses. \n(Sistem Google Apps Script Webhook perlu diaktifkan di sini untuk hantar ke Drive).");
-            
-            // Di sini kod fetch() ke Google Apps Script (GAS) Webhook akan dimasukkan nanti.
-            // Buat masa ni kita reset button je.
-            setTimeout(()=> {
-                submitBtn.style.opacity = "1";
-                submitBtn.style.pointerEvents = "auto";
-                submitBtn.querySelector('i.ph-spinner').style.display = 'none';
-                submitBtn.querySelector('i.ph-check-circle').style.display = 'inline-block';
-                submitBtn.querySelector('span').innerText = 'Hantar & Setuju Agreement';
-            }, 2000);
+            try {
+                // Convert gambar ke teks Base64
+                const icBase64 = await toBase64(icInput.files[0]);
+                const receiptBase64 = await toBase64(receiptInput.files[0]);
+                const signatureBase64 = signaturePad.toDataURL();
+
+                // Ambil ID tempahan dari URL pautan
+                const urlParams = new URLSearchParams(window.location.search);
+                const bookingId = urlParams.get('id') || "Manual_Direct";
+
+                const payload = {
+                    bookingId: bookingId,
+                    ic: icBase64,
+                    receipt: receiptBase64,
+                    signature: signatureBase64
+                };
+
+                // URL WEB APP GOOGLE APPS SCRIPT KAU YANG REAL
+                const GAS_URL = "https://script.google.com/macros/s/AKfycbyWG73KcBNUZyTrBVhjecgBKsO8Z_kZ2KmNn4LtBnpXPdNJyJMpHsJhp-dqoae2xSM4FA/exec";
+
+                const response = await fetch(GAS_URL, {
+                    method: "POST",
+                    body: JSON.stringify(payload)
+                });
+
+                const result = await response.json();
+                
+                if(result.status === "success") {
+                    alert("Berjaya! Dokumen Perjanjian dan Resit anda telah selamat disimpan ke Google Drive. Sila maklumkan kepada admin di WhatsApp untuk penyerahan kamera.");
+                    window.location.href = "index.html"; 
+                } else {
+                    alert("Ralat sistem Google: " + result.message);
+                    resetBtn(submitBtn);
+                }
+
+            } catch (error) {
+                alert("Ralat sambungan server. Sila pastikan Apps Script anda di-deploy sebagai 'Anyone'.");
+                resetBtn(submitBtn);
+            }
+        }
+
+        function resetBtn(btn) {
+            btn.innerHTML = '<i class="ph ph-check-circle"></i> Hantar & Setuju Agreement';
+            btn.style.pointerEvents = "auto";
+            btn.style.opacity = "1";
         }
     </script>
 </body>

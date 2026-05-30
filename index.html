@@ -516,11 +516,18 @@
     if (error) {
         alert("Error saving booking: " + error.message);
     } else {
-        // 2. Kalau sukses, baru buka WhatsApp
-        const bookingId = data[0].id;
-        const phoneNumber = "601139585168"; 
-        const message = `Hi! I've placed a booking (ID: ${bookingId.slice(0,5)}). Please check the admin dashboard.`;
+        // MASUKKAN NOMBOR WHATSAPP KAU DI SINI
+        const phoneNumber = "60123456789"; 
+        
+        // AYAT WHATSAPP YANG PENDEK & KEMAS
+        const message = `Hi Kodak KL! 📸 I've just placed a booking (ID: ${bookingId.slice(0,5)}). Please check the details on your system and let me know if we can proceed. Thank you!`;
+
         window.open(`https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`, '_blank');
+        
+        // Refresh page selepas 2 saat
+        setTimeout(() => {
+            window.location.reload();
+        }, 2000);
     }
 });
     </script>
