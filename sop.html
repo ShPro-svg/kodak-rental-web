@@ -222,6 +222,13 @@
             if (isAgreed) {
                 sections.classList.add('show');
                 submitBtn.classList.add('active');
+                
+                // KOD BARU: Wajib resize canvas SELEPAS kotak ni muncul supaya boleh lukis
+                setTimeout(() => {
+                    resizeCanvas();
+                    signaturePad.clear(); // Bersihkan pad supaya ready
+                }, 150); 
+                
             } else {
                 sections.classList.remove('show');
                 submitBtn.classList.remove('active');
