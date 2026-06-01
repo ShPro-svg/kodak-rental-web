@@ -19,12 +19,14 @@
             --bg-base: #F4F4F5;
             --primary-dark: #0A0A0A;  /* Rich Black */
             --text-main: #0A0A0A;
+            --text-secondary: #52525C;
             --border-strong: #E4E4E7;
             --success-bg: #D1FAE5;
             --success-text: #065F46;
         }
         
-        body { font-family: 'Poppins', sans-serif; background: var(--bg-base); padding: 15px; color: var(--text-main); display: none; }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; }
+        body { background: var(--bg-base); padding: 15px; color: var(--text-main); display: none; }
         .container { max-width: 1000px; margin: 0 auto; padding-bottom: 40px; }
         
         /* HEADER & LOGOUT */
@@ -36,36 +38,106 @@
         /* STATS GRID */
         .stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 25px; }
         .stat-card { background: white; padding: 25px; border-radius: 20px; border: 1px solid var(--border-strong); box-shadow: 0 4px 15px rgba(10,10,10,0.02);}
-        .stat-card span { font-size: 0.8rem; color: #52525C; text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;}
+        .stat-card span { font-size: 0.8rem; color: var(--text-secondary); text-transform: uppercase; font-weight: 700; letter-spacing: 0.5px;}
         .stat-card h2 { font-size: 1.8rem; color: var(--brand-main); margin-top: 8px; font-weight: 800;}
+
+        /* TAB NAVIGATION */
+        .tab-container { display: flex; gap: 10px; margin-bottom: 15px; }
+        .tab-btn { background: white; border: 1px solid var(--border-strong); padding: 12px 20px; border-radius: 12px; font-weight: 600; cursor: pointer; transition: 0.3s; color: var(--text-secondary); font-size: 0.9rem; flex: 1; text-align: center; }
+        .tab-btn.active { background: var(--brand-main); color: white; border-color: var(--brand-main); }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeIn 0.3s; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
         /* TABLE CARD */
         .card { background: white; border-radius: 24px; padding: 25px; border: 1px solid var(--border-strong); overflow-x: auto; box-shadow: 0 4px 15px rgba(10,10,10,0.02);}
-        .card h3 { margin-bottom: 20px; display: flex; align-items: center; gap: 10px; color: var(--brand-dark); font-weight: 700;}
-        
-        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; min-width: 750px; }
-        th { text-align: left; padding: 15px 12px; border-bottom: 2px solid var(--bg-base); color: #52525C; font-weight: 600; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.5px;}
-        td { padding: 15px 12px; border-bottom: 1px solid var(--bg-base); font-weight: 500;}
-        
-        .status-badge { padding: 6px 12px; border-radius: 8px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; display: inline-block;}
-        .status-pending { background: #FEF3C7; color: #92400E; }
-        .status-confirmed { background: var(--success-bg); color: var(--success-text); }
+        table { width: 100%; border-collapse: collapse; font-size: 0.85rem; min-width: 800px; }
+        th { text-align: left; padding: 15px 12px; border-bottom: 2px solid var(--bg-base); color: var(--text-secondary); font-weight: 600; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.5px;}
+        td { padding: 15px 12px; border-bottom: 1px solid var(--bg-base); font-weight: 500; vertical-align: top;}
 
-        .btn-action { padding: 8px 14px; border-radius: 10px; border: none; cursor: pointer; font-size: 0.75rem; font-weight: 600; transition: 0.2s; margin-bottom: 5px;}
-        .btn-approve { background: var(--brand-main); color: white; margin-right: 5px; }
+        /* BUTTONS & ACTIONS (KEMASKINI SUSUNAN) */
+        .action-group { display: flex; flex-direction: column; gap: 8px; width: 100%; min-width: 140px;}
+        .btn-action { width: 100%; padding: 10px 12px; border-radius: 10px; border: none; cursor: pointer; font-size: 0.8rem; font-weight: 600; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 6px; }
+        .btn-approve { background: var(--brand-main); color: white; }
         .btn-approve:hover { background: var(--brand-dark); }
         .btn-delete { background: #FEE2E2; color: #991B1B; }
-        .btn-sop { background: var(--brand-light); color: var(--brand-main); text-decoration: none; display: inline-flex; align-items: center; gap: 5px; padding: 8px 14px; border-radius: 10px; margin-top: 5px; font-size: 0.75rem; font-weight: 700; border: 1px solid var(--brand-main);}
+        .btn-delete:hover { background: #FECACA; }
+        .btn-camera { background: var(--primary-dark); color: white; }
+        .btn-camera:hover { opacity: 0.8; }
+        .btn-sop { background: var(--brand-light); color: var(--brand-main); text-decoration: none; padding: 10px 12px; border-radius: 10px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; font-size: 0.8rem; font-weight: 700; border: 1px solid var(--brand-main); width: 100%;}
         .btn-sop:hover { background: var(--brand-main); color: white; }
+
+        /* TOAST NOTIFICATION */
+        #toast { visibility: hidden; min-width: 250px; background-color: var(--primary-dark); color: #fff; text-align: center; border-radius: 12px; padding: 16px; position: fixed; z-index: 9999; left: 50%; transform: translateX(-50%); top: 20px; font-size: 0.85rem; font-weight: 500; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+        #toast.show { visibility: visible; animation: fadein 0.5s, fadeout 0.5s 2.5s; }
+        @keyframes fadein { from { top: 0; opacity: 0; } to { top: 20px; opacity: 1; } }
+        @keyframes fadeout { from { top: 20px; opacity: 1; } to { top: 0; opacity: 0; } }
+
+        /* CUSTOM MODAL DELETE */
+        .modal-overlay { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); backdrop-filter: blur(4px); align-items: center; justify-content: center; }
+        .modal-box { background: white; padding: 30px; border-radius: 20px; width: 90%; max-width: 400px; text-align: center; box-shadow: 0 10px 40px rgba(0,0,0,0.2); animation: scaleUp 0.3s; }
+        @keyframes scaleUp { from { transform: scale(0.9); opacity: 0;} to { transform: scale(1); opacity: 1;} }
+        .modal-box h3 { color: #991B1B; margin-bottom: 10px; font-size: 1.2rem; }
+        .modal-box p { color: var(--text-secondary); font-size: 0.85rem; margin-bottom: 20px; }
+        .modal-btns { display: flex; gap: 10px; }
+        .modal-btns button { flex: 1; padding: 12px; border-radius: 12px; border: none; font-weight: 600; cursor: pointer; }
+        .btn-cancel { background: var(--bg-base); color: var(--text-main); }
+        .btn-confirm-del { background: #991B1B; color: white; }
+
+        /* IN-APP CAMERA UI OVERLAY */
+        .camera-overlay { display: none; position: fixed; z-index: 2000; left: 0; top: 0; width: 100%; height: 100%; background: var(--primary-dark); flex-direction: column; align-items: center; justify-content: center; }
+        .camera-header { width: 100%; padding: 20px; text-align: center; color: white; font-weight: 700; font-size: 1.1rem; position: absolute; top: 0; }
+        .camera-view { width: 100%; max-width: 500px; padding: 0 15px; }
+        #videoElement { width: 100%; border-radius: 20px; background: #222; border: 2px solid var(--border-strong); }
+        .camera-controls { display: flex; gap: 15px; margin-top: 20px; justify-content: center; width: 100%; max-width: 500px; padding: 0 15px;}
+        .btn-snap { flex: 2; padding: 15px; background: var(--brand-main); color: white; border: none; border-radius: 50px; font-weight: bold; font-size: 1.1rem; cursor: pointer; box-shadow: 0 4px 15px rgba(0, 77, 192, 0.4); display: flex; align-items: center; justify-content: center; gap: 8px;}
+        .btn-snap:active { transform: scale(0.95); }
+        .btn-close-cam { flex: 1; padding: 15px; background: #333; color: white; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; }
+
+        /* LOADING OVERLAY */
+        .loading-overlay { display: none; position: fixed; z-index: 9999; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); flex-direction: column; align-items: center; justify-content: center; color: var(--brand-main); }
+        .loading-overlay i { font-size: 3rem; margin-bottom: 10px; }
+        .loading-overlay p { font-weight: 700; font-size: 1rem; }
     </style>
 </head>
 <body>
+    
+    <div class="loading-overlay" id="loadingOverlay">
+        <i class="ph ph-spinner ph-spin"></i>
+        <p>Memuat naik gambar ke Drive...</p>
+    </div>
+
+    <div class="modal-overlay" id="deleteModal">
+        <div class="modal-box">
+            <h3>Padam Tempahan?</h3>
+            <p>Tindakan ini tidak boleh diundur. Semua data berkaitan akan hilang dari pangkalan data.</p>
+            <div class="modal-btns">
+                <button class="btn-cancel" onclick="closeModal()">Batal</button>
+                <button class="btn-confirm-del" id="confirmDeleteBtn">Ya, Padam</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="camera-overlay" id="cameraOverlay">
+        <div class="camera-header" id="cameraTitle">Ambil Gambar Logistik</div>
+        <div class="camera-view">
+            <video id="videoElement" autoplay playsinline></video>
+        </div>
+        <div class="camera-controls">
+            <button class="btn-close-cam" onclick="closeCamera()">Batal</button>
+            <button class="btn-snap" onclick="takeSnapshot()"><i class="ph-fill ph-camera"></i> Snap Photo</button>
+        </div>
+        <canvas id="canvasElement" style="display: none;"></canvas>
+    </div>
+
+    <div id="toast">Notifikasi</div>
+
     <div class="container">
         
         <div class="admin-header">
-            <h2><i class="ph-fill ph-camera"></i> RentACam MY</h2>
+            <h2><i class="ph-fill ph-camera"></i> Admin Dashboard</h2>
             <button class="btn-logout" onclick="handleLogout()">
-                <i class="ph ph-sign-out"></i> Logout
+                <i class="ph-bold ph-sign-out"></i> Logout
             </button>
         </div>
 
@@ -80,33 +152,57 @@
             </div>
         </div>
 
-        <div class="card">
-            <h3><i class="ph-fill ph-list-bullets" style="color: var(--brand-main);"></i> Management Dashboard</h3>
+        <div class="tab-container">
+            <div class="tab-btn active" onclick="switchTab('pending')" id="btn-pending"><i class="ph-fill ph-clock"></i> Pending Requests</div>
+            <div class="tab-btn" onclick="switchTab('confirmed')" id="btn-confirmed"><i class="ph-fill ph-check-circle"></i> Approved Bookings</div>
+        </div>
+
+        <div class="card tab-content active" id="tab-pending">
             <table>
                 <thead>
                     <tr>
                         <th>Pelanggan</th>
                         <th>Tarikh & Tempoh</th>
-                        <th>Kiraan Harga (Auto)</th>
-                        <th>Status</th>
+                        <th>Kiraan Harga</th>
                         <th>Tindakan</th>
                     </tr>
                 </thead>
-                <tbody id="bookingTable">
-                    <tr><td colspan="5" style="text-align: center; color: #52525C; padding: 40px;"><i class="ph ph-spinner ph-spin" style="font-size: 1.5rem;"></i> Menghubungkan pangkalan data...</td></tr>
+                <tbody id="pendingTable">
+                    <tr><td colspan="4" style="text-align: center; padding: 40px;"><i class="ph ph-spinner ph-spin" style="font-size: 1.5rem;"></i> Loading...</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div class="card tab-content" id="tab-confirmed">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Pelanggan</th>
+                        <th>Maklumat Sewaan</th>
+                        <th>Pautan T&C</th>
+                        <th>Logistik Kamera</th>
+                    </tr>
+                </thead>
+                <tbody id="confirmedTable">
+                    <tr><td colspan="4" style="text-align: center; padding: 40px;"><i class="ph ph-spinner ph-spin" style="font-size: 1.5rem;"></i> Loading...</td></tr>
                 </tbody>
             </table>
         </div>
     </div>
 
     <script>
-        // MASUKKAN KREDENSIAL SUPABASE KAU
+        // KREDENSIAL SISTEM
         const SUPABASE_URL = "https://udoncfzvxixbmjwkogew.supabase.co";
-        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVkb25jZnp2eGl4Ym1qd2tvZ2V3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk4OTIzNjYsImV4cCI6MjA5NTQ2ODM2Nn0.dH7XDMhJMDaygZDL_rGU72wK2BU_QjiMJ-Iu0kcZ0jw"; // Pastikan key ni betul
-        
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVkb25jZnp2eGl4Ym1qd2tvZ2V3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk4OTIzNjYsImV4cCI6MjA5NTQ2ODM2Nn0.dH7XDMhJMDaygZDL_rGU72wK2BU_QjiMJ-Iu0kcZ0jw";
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        const GAS_URL = "https://script.google.com/macros/s/AKfycbyWG73KcBNUZyTrBVhjecgBKsO8Z_kZ2KmNn4LtBnpXPdNJyJMpHsJhp-dqoae2xSM4FA/exec";
 
-        // --- 1. SECURITY AUTH ---
+        let currentDeleteId = null;
+        let currentUploadData = {};
+        let videoStream = null;
+
+        // --- AUTH ---
         async function checkAuth() {
             const { data: { session } } = await supabaseClient.auth.getSession();
             if (!session) { window.location.href = "login.html"; } 
@@ -118,114 +214,220 @@
             window.location.href = "login.html";
         }
 
-        // --- 2. LOGIK KIRAAN HARGA DINAMIK RENTACAM MY ---
+        // --- TAB SWITCHER ---
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            document.getElementById('btn-' + tabId).classList.add('active');
+            document.getElementById('tab-' + tabId).classList.add('active');
+        }
+
+        // --- TOAST NOTIFICATION ---
+        function showToast(message) {
+            const toast = document.getElementById("toast");
+            toast.innerText = message;
+            toast.className = "show";
+            setTimeout(function(){ toast.className = toast.className.replace("show", ""); }, 3000);
+        }
+
+        // --- MODAL DELETE LOGIC ---
+        function promptDelete(id) {
+            currentDeleteId = id;
+            document.getElementById('deleteModal').style.display = 'flex';
+        }
+        function closeModal() {
+            currentDeleteId = null;
+            document.getElementById('deleteModal').style.display = 'none';
+        }
+        document.getElementById('confirmDeleteBtn').addEventListener('click', async () => {
+            if(currentDeleteId) {
+                closeModal();
+                showToast("Memadam rekod...");
+                const { error } = await supabaseClient.from('bookings').delete().eq('id', currentDeleteId);
+                if (error) showToast("Ralat: " + error.message);
+                else { showToast("Rekod dipadam."); loadAdmin(); }
+            }
+        });
+
+        // --- KIRA HARGA ---
         function calculatePrice(startStr, endStr) {
             let current = new Date(startStr);
             const end = new Date(endStr);
-            let days = 0;
-            let weekdays = 0;
-            let weekends = 0;
-
-            // Loop untuk setiap hari dalam tempoh sewaan
+            let days = 0, weekdays = 0, weekends = 0;
             while(current <= end) {
-                const day = current.getDay(); // 0:Ahad, 5:Jumaat, 6:Sabtu
-                if(day === 0 || day === 5 || day === 6) { weekends++; } 
-                else { weekdays++; }
-                
+                const day = current.getDay(); 
+                if(day === 0 || day === 5 || day === 6) weekends++; else weekdays++;
                 current.setDate(current.getDate() + 1);
                 days++;
             }
-
-            // Pakej Mingguan (7 Hari)
             if (days >= 7) {
                 let weeks = Math.floor(days / 7);
                 let remainderDays = days % 7;
                 return (weeks * 100) + (remainderDays * 15);
-            } 
-            // Biasa
-            else {
+            } else {
                 let weekdayRate = (weekdays >= 4) ? 15 : 18;
                 return (weekdays * weekdayRate) + (weekends * 25);
             }
         }
 
-        // --- 3. LOAD DATA & BINA JADUAL ---
+        // --- LOAD DATA MAIN ---
         async function loadAdmin() {
-            const tableBody = document.getElementById('bookingTable');
-            tableBody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #52525C; padding: 40px;"><i class="ph ph-spinner ph-spin" style="font-size: 1.5rem; vertical-align: middle;"></i> Memuat turun data...</td></tr>';
+            const pendingTbody = document.getElementById('pendingTable');
+            const confirmedTbody = document.getElementById('confirmedTable');
+            
+            pendingTbody.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 40px;"><i class="ph ph-spinner ph-spin" style="font-size: 1.5rem;"></i> Loading...</td></tr>';
+            confirmedTbody.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 40px;"><i class="ph ph-spinner ph-spin" style="font-size: 1.5rem;"></i> Loading...</td></tr>';
 
             const { data, error } = await supabaseClient.from('bookings').select('*').order('created_at', { ascending: false });
             
-            if (error) {
-                tableBody.innerHTML = `<tr><td colspan="5" style="text-align: center; color: #991B1B; padding: 30px;">Ralat Pangkalan Data: ${error.message}</td></tr>`;
-                return;
-            }
+            if (error) { showToast("Ralat pangkalan data."); return; }
 
-            if(!data || data.length === 0) {
-                tableBody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #52525C; padding: 40px; font-weight: 500;">Tiada rekod tempahan dijumpai.</td></tr>';
-                document.getElementById('totalIncome').innerText = `RM 0.00`;
-                document.getElementById('activeCount').innerText = 0;
-                return;
-            }
-
+            pendingTbody.innerHTML = '';
+            confirmedTbody.innerHTML = '';
             let income = 0;
             let active = 0;
-            tableBody.innerHTML = ''; 
 
             data.forEach(b => {
                 const start = new Date(b.start_date);
                 const end = new Date(b.end_date);
                 const diffDays = Math.ceil(Math.abs(end - start) / (1000 * 60 * 60 * 24)) + 1; 
-                
-                // Panggil fungsi kiraan harga
                 const rentalPrice = calculatePrice(b.start_date, b.end_date);
 
-                if (b.status === 'confirmed') {
+                if (b.status === 'pending') {
+                    pendingTbody.innerHTML += `
+                        <tr>
+                            <td>
+                                <strong style="color: var(--primary-dark); font-size: 0.95rem;">${b.customer_name}</strong><br>
+                                <span style="color: var(--text-secondary); font-size: 0.7rem;">ID: ${b.id.slice(0,6).toUpperCase()} | Loc: ${b.location}</span>
+                            </td>
+                            <td>${b.start_date} <i class="ph-bold ph-arrow-right" style="color: var(--brand-main); font-size: 0.75rem;"></i> ${b.end_date}<br><span style="display:inline-block; background: var(--bg-base); padding: 2px 6px; border-radius: 4px; font-size: 0.7rem; font-weight: 700; margin-top: 3px;">${diffDays} Hari</span></td>
+                            <td><strong style="font-size: 0.95rem; color: var(--brand-main);">RM ${rentalPrice}</strong></td>
+                            <td style="width: 150px;">
+                                <div class="action-group">
+                                    <button class="btn-action btn-approve" onclick="updateStatus('${b.id}', 'confirmed')"><i class="ph-bold ph-check"></i> Approve</button>
+                                    <button class="btn-action btn-delete" onclick="promptDelete('${b.id}')"><i class="ph-bold ph-trash"></i> Delete</button>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                } else if (b.status === 'confirmed') {
                     income += rentalPrice; 
                     active++;
+                    confirmedTbody.innerHTML += `
+                        <tr>
+                            <td>
+                                <strong style="color: var(--primary-dark); font-size: 0.95rem;">${b.customer_name}</strong><br>
+                                <span style="color: var(--text-secondary); font-size: 0.7rem;">ID: ${b.id.slice(0,6).toUpperCase()}</span>
+                            </td>
+                            <td><small><strong>Ambil:</strong> ${b.pickup_time}<br><strong>Pulang:</strong> ${b.return_time}<br><strong>Sewa:</strong> RM${rentalPrice}</small></td>
+                            <td style="width: 200px;">
+                                <div class="action-group">
+                                    <a href="sop.html?id=${b.id}" target="_blank" class="btn-sop"><i class="ph-bold ph-link"></i> Link T&C Pelanggan</a>
+                                </div>
+                            </td>
+                            <td style="width: 200px;">
+                                <div class="action-group">
+                                    <button class="btn-action btn-camera" onclick="openLiveCamera('delivery', '${b.id}', '${b.customer_name}')"><i class="ph-fill ph-camera"></i> Delivery Photo</button>
+                                    <button class="btn-action btn-camera" onclick="openLiveCamera('return', '${b.id}', '${b.customer_name}')"><i class="ph-fill ph-camera"></i> Return Photo</button>
+                                    <button class="btn-action btn-delete" onclick="promptDelete('${b.id}')"><i class="ph-bold ph-trash"></i> Padam Rekod</button>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
                 }
-
-                tableBody.innerHTML += `
-                    <tr>
-                        <td>
-                            <strong style="color: var(--primary-dark); font-size: 0.95rem;">${b.customer_name}</strong><br>
-                            <span style="color: var(--text-secondary); font-size: 0.75rem;">ID: ${b.id.slice(0,6).toUpperCase()}</span>
-                        </td>
-                        <td>
-                            ${b.start_date} <i class="ph-bold ph-arrow-right" style="color: var(--brand-main); font-size: 0.75rem;"></i> ${b.end_date} <br>
-                            <span style="display:inline-block; background: var(--brand-light); color: var(--brand-dark); padding: 4px 8px; border-radius: 6px; font-size: 0.7rem; font-weight: 700; margin-top: 5px;">${diffDays} Hari</span>
-                        </td>
-                        <td>
-                            <strong style="font-size: 1rem; color: var(--brand-main);">Sewa: RM ${rentalPrice}</strong><br>
-                            <small style="color: var(--text-secondary); font-weight: 600;">+ Deposit: RM 20</small>
-                        </td>
-                        <td><span class="status-badge status-${b.status}">${b.status}</span></td>
-                        <td>
-                            ${b.status === 'pending' ? `<button class="btn-action btn-approve" onclick="updateStatus('${b.id}', 'confirmed')"><i class="ph-bold ph-check"></i> Approve</button>` : ''}
-                            <button class="btn-action btn-delete" onclick="deleteBooking('${b.id}')"><i class="ph-bold ph-trash"></i></button>
-                            <br>
-                            <a href="sop.html?id=${b.id}" target="_blank" class="btn-sop"><i class="ph-fill ph-link"></i> View T&C Link</a>
-                        </td>
-                    </tr>
-                `;
             });
+
+            if(pendingTbody.innerHTML === '') pendingTbody.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 30px; color: #999;">Tiada request baru.</td></tr>';
+            if(confirmedTbody.innerHTML === '') confirmedTbody.innerHTML = '<tr><td colspan="4" style="text-align: center; padding: 30px; color: #999;">Tiada booking aktif.</td></tr>';
 
             document.getElementById('totalIncome').innerText = `RM ${income.toFixed(2)}`;
             document.getElementById('activeCount').innerText = active;
         }
 
         async function updateStatus(id, status) {
+            showToast("Meluluskan tempahan...");
             const { error } = await supabaseClient.from('bookings').update({ status }).eq('id', id);
-            if (error) alert("Error updating status: " + error.message);
-            loadAdmin();
+            if (error) showToast("Ralat: " + error.message);
+            else { showToast("Tempahan diluluskan!"); loadAdmin(); }
         }
 
-        async function deleteBooking(id) {
-            if(confirm("Padam tempahan ini secara kekal? Tindakan ini tidak boleh diundur.")) {
-                const { error } = await supabaseClient.from('bookings').delete().eq('id', id);
-                if (error) alert("Error deleting booking: " + error.message);
-                loadAdmin();
+        // --- IN-APP LIVE CAMERA LOGIC (FORCE REAR CAMERA) ---
+        async function openLiveCamera(type, bookingId, customerName) {
+            currentUploadData = { type: type, bookingId: bookingId, customerName: customerName };
+            document.getElementById('cameraTitle').innerText = type === 'delivery' ? 'Bukti Serahan (Delivery)' : 'Bukti Pulangan (Return)';
+            document.getElementById('cameraOverlay').style.display = 'flex';
+            
+            try {
+                // Cuba paksa buka kamera belakang (environment)
+                try {
+                    videoStream = await navigator.mediaDevices.getUserMedia({ 
+                        video: { facingMode: { exact: "environment" } } 
+                    });
+                } catch (err) {
+                    // Fallback kalau device tak support 'exact' (cth: laptop)
+                    videoStream = await navigator.mediaDevices.getUserMedia({ 
+                        video: { facingMode: "environment" } 
+                    });
+                }
+                document.getElementById('videoElement').srcObject = videoStream;
+            } catch (err) {
+                alert("Gagal membuka kamera. Pastikan browser anda membenarkan akses kamera.");
+                closeCamera();
             }
+        }
+
+        function closeCamera() {
+            if (videoStream) {
+                videoStream.getTracks().forEach(track => track.stop());
+                videoStream = null;
+            }
+            document.getElementById('cameraOverlay').style.display = 'none';
+        }
+
+        async function takeSnapshot() {
+            const video = document.getElementById('videoElement');
+            const canvas = document.getElementById('canvasElement');
+            
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            
+            const base64Data = canvas.toDataURL('image/jpeg', 0.85);
+            
+            closeCamera();
+            uploadPhotoToDrive(base64Data);
+        }
+
+        async function uploadPhotoToDrive(base64Data) {
+            document.getElementById('loadingOverlay').style.display = 'flex';
+
+            try {
+                const payload = {
+                    action: "admin_upload",
+                    bookingId: currentUploadData.bookingId,
+                    customerName: currentUploadData.customerName,
+                    deliveryPhoto: currentUploadData.type === 'delivery' ? base64Data : null,
+                    returnPhoto: currentUploadData.type === 'return' ? base64Data : null
+                };
+
+                const response = await fetch(GAS_URL, {
+                    method: "POST",
+                    body: JSON.stringify(payload)
+                });
+                const result = await response.json();
+
+                if(result.status === "success") {
+                    showToast("Gambar logistik berjaya disimpan di Drive!");
+                } else {
+                    alert("Ralat Drive: " + result.message);
+                }
+            } catch (err) {
+                alert("Ralat sambungan. Sila cuba lagi.");
+            }
+
+            document.getElementById('loadingOverlay').style.display = 'none';
         }
 
         checkAuth();
