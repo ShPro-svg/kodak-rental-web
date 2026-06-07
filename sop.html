@@ -337,9 +337,10 @@
             }
         }
 
-        // --- SISTEM KOMPRESI GAMBAR (IMAGE COMPRESSION) ---
+        // --- SISTEM KOMPRESI GAMBAR AGGRESIF (MAXIMUM COMPRESSION) ---
         const processFile = (file) => new Promise((resolve, reject) => {
-            if (!file.type.startsWith('image/')) {
+            // Jika PDF, kita tak boleh kompres pakai canvas, jadi hantar terus
+            if (file.type === 'application/pdf') {
                 const reader = new FileReader();
                 reader.readAsDataURL(file);
                 reader.onload = () => resolve(reader.result);
@@ -347,6 +348,7 @@
                 return;
             }
 
+            // Jika gambar (JPEG/PNG/HEIC), kita jalankan kompresi berat
             const reader = new FileReader();
             reader.readAsDataURL(file);
             reader.onload = (event) => {
@@ -354,13 +356,23 @@
                 img.src = event.target.result;
                 img.onload = () => {
                     const canvas = document.createElement('canvas');
-                    const MAX_WIDTH = 1000; 
+                    
+                    // Hadkan saiz maksimum ke 600px sahaja (sangat ringan)
+                    const MAX_WIDTH = 600; 
+                    const MAX_HEIGHT = 800;
                     let width = img.width;
                     let height = img.height;
 
-                    if (width > MAX_WIDTH) {
-                        height = Math.round((height * MAX_WIDTH) / width);
-                        width = MAX_WIDTH;
+                    if (width > height) {
+                        if (width > MAX_WIDTH) {
+                            height *= MAX_WIDTH / width;
+                            width = MAX_WIDTH;
+                        }
+                    } else {
+                        if (height > MAX_HEIGHT) {
+                            width *= MAX_HEIGHT / height;
+                            height = MAX_HEIGHT;
+                        }
                     }
 
                     canvas.width = width;
@@ -368,7 +380,8 @@
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, width, height);
 
-                    const compressedBase64 = canvas.toDataURL('image/jpeg', 0.6);
+                    // Turunkan kualiti JPEG kepada 40% (0.4) supaya tak sangkut kat iPhone
+                    const compressedBase64 = canvas.toDataURL('image/jpeg', 0.4);
                     resolve(compressedBase64);
                 };
                 img.onerror = error => reject(error);
@@ -409,6 +422,7 @@
                     }
                 }
 
+                // Gambar akan diproses dan dikompres di sini
                 const icBase64 = await processFile(icInput.files[0]);
                 const receiptBase64 = await processFile(receiptInput.files[0]);
                 const signatureBase64 = signaturePad.toDataURL();
@@ -443,7 +457,8 @@
                 }
 
             } catch (error) {
-                alert("Connection Error: Request timeout or payload too large. Sila cuba lagi.");
+                // Ralat yang lebih jelas kalau sangkut lagi
+                alert("Ralat sambungan. Ini mungkin kerana saiz fail masih terlalu besar untuk capaian internet anda. Sila cuba gunakan WiFi atau fail yang lebih kecil.");
                 resetBtn(submitBtn);
             }
         }
