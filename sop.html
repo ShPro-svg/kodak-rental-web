@@ -262,23 +262,23 @@
             <span class="close-modal" onclick="hideGuide()"><i class="ph-bold ph-x"></i></span>
             <h3 style="color:var(--brand-dark); font-size: 1.1rem; font-weight: 800;">Document Guide</h3>
             <p style="font-size: 0.8rem; color: var(--text-secondary); margin: 5px 0 15px;">Please watermark your document as shown below for security.</p>
-            <img src="panduan.png" alt="Contoh Palang IC">
+            <img src="panduan.jpg" alt="Contoh Palang IC">
             <button class="btn-submit active" style="margin-top:20px; padding: 14px; font-size: 0.9rem;" onclick="hideGuide()">I Understand</button>
         </div>
     </div>
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-        let currentLang = "en";
-        
-        // MASUKKAN KREDENSIAL SUPABASE KAU DI SINI
+        let currentLang = "en"; // PENGISYTIHARAN BAHASA GLOBAL
+
+        // KREDENSIAL SUPABASE
         const SUPABASE_URL = "https://udoncfzvxixbmjwkogew.supabase.co";
         const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVkb25jZnp2eGl4Ym1qd2tvZ2V3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk4OTIzNjYsImV4cCI6MjA5NTQ2ODM2Nn0.dH7XDMhJMDaygZDL_rGU72wK2BU_QjiMJ-Iu0kcZ0jw";
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         // --- LANGUAGE TOGGLE LOGIC ---
         function setLang(lang) {
-            currentLang = lang; // Kunci data bahasa yang dipilih customer ke memori global
+            currentLang = lang; 
             
             document.getElementById('btn-en').classList.remove('active');
             document.getElementById('btn-bm').classList.remove('active');
@@ -312,7 +312,6 @@
 
         const signaturePad = new SignaturePad(canvas, { penColor: "rgb(10, 10, 10)" });
 
-        // --- UI LOGIC ---
         function toggleSections() {
             const isAgreed = document.getElementById('agreeBtn').checked;
             const sections = document.getElementById('actionSections');
@@ -332,16 +331,52 @@
             const input = document.getElementById(inputId);
             const display = document.getElementById(displayId);
             if(input.files.length > 0) {
-                document.getElementById(displayId).innerText = input.files[0].name;
+                display.innerText = input.files[0].name;
                 display.style.color = "var(--brand-main)";
                 display.style.fontWeight = "600";
             }
         }
 
-        const toBase64 = file => new Promise((resolve, reject) => {
+        // --- SISTEM KOMPRESI GAMBAR BARU (IMAGE COMPRESSION) ---
+        // Ini akan selesaikan masalah timeout / payload too large kat iPhone
+        const processFile = (file) => new Promise((resolve, reject) => {
+            // Kalau file bukan gambar (contoh: resit PDF), tak perlu kompres, terus convert Base64
+            if (!file.type.startsWith('image/')) {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+                return;
+            }
+
+            // Kalau file adalah gambar (IC / Resit jpeg/png), kompres saiz dan kualiti
             const reader = new FileReader();
             reader.readAsDataURL(file);
-            reader.onload = () => resolve(reader.result);
+            reader.onload = (event) => {
+                const img = new Image();
+                img.src = event.target.result;
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    const MAX_WIDTH = 1000; // Hadkan lebar maksimum 1000px
+                    let width = img.width;
+                    let height = img.height;
+
+                    if (width > MAX_WIDTH) {
+                        height = Math.round((height * MAX_WIDTH) / width);
+                        width = MAX_WIDTH;
+                    }
+
+                    canvas.width = width;
+                    canvas.height = height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0, width, height);
+
+                    // Kompres kepada format JPEG dengan kualiti 60%
+                    const compressedBase64 = canvas.toDataURL('image/jpeg', 0.6);
+                    resolve(compressedBase64);
+                };
+                img.onerror = error => reject(error);
+            };
             reader.onerror = error => reject(error);
         });
 
@@ -378,8 +413,9 @@
                     }
                 }
 
-                const icBase64 = await toBase64(icInput.files[0]);
-                const receiptBase64 = await toBase64(receiptInput.files[0]);
+                // Guna fungsi kompresi gambar yang baru
+                const icBase64 = await processFile(icInput.files[0]);
+                const receiptBase64 = await processFile(receiptInput.files[0]);
                 const signatureBase64 = signaturePad.toDataURL();
 
                 const payload = {
@@ -391,10 +427,9 @@
                     ic: icBase64,
                     receipt: receiptBase64,
                     signature: signatureBase64,
-                    lang: currentLang // KOD BARU: Menghantar data 'bm' atau 'en' terus ke Google Drive
+                    lang: currentLang 
                 };
 
-                // URL WEB APP GOOGLE APPS SCRIPT KAU
                 const GAS_URL = "https://script.google.com/macros/s/AKfycbyWG73KcBNUZyTrBVhjecgBKsO8Z_kZ2KmNn4LtBnpXPdNJyJMpHsJhp-dqoae2xSM4FA/exec";
 
                 const response = await fetch(GAS_URL, {
@@ -413,7 +448,7 @@
                 }
 
             } catch (error) {
-                alert("Connection Error. Please try again.");
+                alert("Connection Error: Request timeout or payload too large. Sila cuba lagi.");
                 resetBtn(submitBtn);
             }
         }
