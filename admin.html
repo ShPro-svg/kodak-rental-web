@@ -107,6 +107,7 @@
         <p>Memuat naik gambar ke Drive...</p>
     </div>
 
+    <!-- CUSTOM CONFIRMATION MODAL -->
     <div class="modal-overlay" id="deleteModal">
         <div class="modal-box">
             <h3>Padam Tempahan?</h3>
@@ -118,6 +119,7 @@
         </div>
     </div>
 
+    <!-- IN-APP CAMERA MODAL -->
     <div class="camera-overlay" id="cameraOverlay">
         <div class="camera-header" id="cameraTitle">Ambil Gambar Logistik</div>
         <div class="camera-view">
@@ -152,11 +154,13 @@
             </div>
         </div>
 
+        <!-- TAB BUTTONS -->
         <div class="tab-container">
             <div class="tab-btn active" onclick="switchTab('pending')" id="btn-pending"><i class="ph-fill ph-clock"></i> Pending Requests</div>
             <div class="tab-btn" onclick="switchTab('confirmed')" id="btn-confirmed"><i class="ph-fill ph-check-circle"></i> Approved Bookings</div>
         </div>
 
+        <!-- PENDING TAB CONTENT -->
         <div class="card tab-content active" id="tab-pending">
             <table>
                 <thead>
@@ -173,6 +177,7 @@
             </table>
         </div>
 
+        <!-- CONFIRMED TAB CONTENT -->
         <div class="card tab-content" id="tab-confirmed">
             <table>
                 <thead>
@@ -351,20 +356,18 @@
             else { showToast("Tempahan diluluskan!"); loadAdmin(); }
         }
 
-        // --- IN-APP LIVE CAMERA LOGIC (FORCE REAR CAMERA) ---
+        // --- IN-APP LIVE CAMERA LOGIC (COMPRESSED IMAGE + ERROR HANDLING) ---
         async function openLiveCamera(type, bookingId, customerName) {
             currentUploadData = { type: type, bookingId: bookingId, customerName: customerName };
             document.getElementById('cameraTitle').innerText = type === 'delivery' ? 'Bukti Serahan (Delivery)' : 'Bukti Pulangan (Return)';
             document.getElementById('cameraOverlay').style.display = 'flex';
             
             try {
-                // Cuba paksa buka kamera belakang (environment)
                 try {
                     videoStream = await navigator.mediaDevices.getUserMedia({ 
                         video: { facingMode: { exact: "environment" } } 
                     });
                 } catch (err) {
-                    // Fallback kalau device tak support 'exact' (cth: laptop)
                     videoStream = await navigator.mediaDevices.getUserMedia({ 
                         video: { facingMode: "environment" } 
                     });
@@ -388,13 +391,24 @@
             const video = document.getElementById('videoElement');
             const canvas = document.getElementById('canvasElement');
             
-            canvas.width = video.videoWidth;
-            canvas.height = video.videoHeight;
+            // Limit saiz kepada max 800px untuk elak ralat timeout di iPhone / GAS
+            const MAX_WIDTH = 800;
+            let width = video.videoWidth;
+            let height = video.videoHeight;
+            
+            if (width > MAX_WIDTH) {
+                height = Math.round((height * MAX_WIDTH) / width);
+                width = MAX_WIDTH;
+            }
+            
+            canvas.width = width;
+            canvas.height = height;
             
             const ctx = canvas.getContext('2d');
-            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            ctx.drawImage(video, 0, 0, width, height);
             
-            const base64Data = canvas.toDataURL('image/jpeg', 0.85);
+            // Set kualiti 0.6 (60%) supaya file lebih ringan untuk dihantar ke Google Drive
+            const base64Data = canvas.toDataURL('image/jpeg', 0.6);
             
             closeCamera();
             uploadPhotoToDrive(base64Data);
@@ -416,15 +430,16 @@
                     method: "POST",
                     body: JSON.stringify(payload)
                 });
+                
                 const result = await response.json();
 
                 if(result.status === "success") {
                     showToast("Gambar logistik berjaya disimpan di Drive!");
                 } else {
-                    alert("Ralat Drive: " + result.message);
+                    alert("Ralat sistem Drive: " + result.message);
                 }
             } catch (err) {
-                alert("Ralat sambungan. Sila cuba lagi.");
+                alert("Ralat sambungan: " + err.message + ". Sila semak status deployment Google Apps Script anda.");
             }
 
             document.getElementById('loadingOverlay').style.display = 'none';
