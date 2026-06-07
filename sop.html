@@ -228,7 +228,7 @@
                         <i class="ph ph-camera main-icon"></i>
                         <p class="main-text">Take Photo / Upload</p>
                         <div id="icFileName" class="file-name">No file chosen</div>
-                        <input type="file" id="icInput" accept="image/*" capture="environment" style="display:none" onchange="updateFileName('icInput', 'icFileName')">
+                        <input type="file" id="icInput" accept="image/*" style="display:none" onchange="updateFileName('icInput', 'icFileName')">
                     </div>
                 </div>
 
@@ -337,10 +337,8 @@
             }
         }
 
-        // --- SISTEM KOMPRESI GAMBAR BARU (IMAGE COMPRESSION) ---
-        // Ini akan selesaikan masalah timeout / payload too large kat iPhone
+        // --- SISTEM KOMPRESI GAMBAR (IMAGE COMPRESSION) ---
         const processFile = (file) => new Promise((resolve, reject) => {
-            // Kalau file bukan gambar (contoh: resit PDF), tak perlu kompres, terus convert Base64
             if (!file.type.startsWith('image/')) {
                 const reader = new FileReader();
                 reader.readAsDataURL(file);
@@ -349,7 +347,6 @@
                 return;
             }
 
-            // Kalau file adalah gambar (IC / Resit jpeg/png), kompres saiz dan kualiti
             const reader = new FileReader();
             reader.readAsDataURL(file);
             reader.onload = (event) => {
@@ -357,7 +354,7 @@
                 img.src = event.target.result;
                 img.onload = () => {
                     const canvas = document.createElement('canvas');
-                    const MAX_WIDTH = 1000; // Hadkan lebar maksimum 1000px
+                    const MAX_WIDTH = 1000; 
                     let width = img.width;
                     let height = img.height;
 
@@ -371,7 +368,6 @@
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, width, height);
 
-                    // Kompres kepada format JPEG dengan kualiti 60%
                     const compressedBase64 = canvas.toDataURL('image/jpeg', 0.6);
                     resolve(compressedBase64);
                 };
@@ -413,7 +409,6 @@
                     }
                 }
 
-                // Guna fungsi kompresi gambar yang baru
                 const icBase64 = await processFile(icInput.files[0]);
                 const receiptBase64 = await processFile(receiptInput.files[0]);
                 const signatureBase64 = signaturePad.toDataURL();
