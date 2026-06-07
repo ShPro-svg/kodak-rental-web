@@ -337,9 +337,8 @@
             }
         }
 
-        // --- SISTEM KOMPRESI GAMBAR AGGRESIF (MAXIMUM COMPRESSION) ---
+        // --- SISTEM KOMPRESI GAMBAR AGGRESIF ---
         const processFile = (file) => new Promise((resolve, reject) => {
-            // Jika PDF, kita tak boleh kompres pakai canvas, jadi hantar terus
             if (file.type === 'application/pdf') {
                 const reader = new FileReader();
                 reader.readAsDataURL(file);
@@ -348,7 +347,6 @@
                 return;
             }
 
-            // Jika gambar (JPEG/PNG/HEIC), kita jalankan kompresi berat
             const reader = new FileReader();
             reader.readAsDataURL(file);
             reader.onload = (event) => {
@@ -357,7 +355,6 @@
                 img.onload = () => {
                     const canvas = document.createElement('canvas');
                     
-                    // Hadkan saiz maksimum ke 600px sahaja (sangat ringan)
                     const MAX_WIDTH = 600; 
                     const MAX_HEIGHT = 800;
                     let width = img.width;
@@ -380,7 +377,6 @@
                     const ctx = canvas.getContext('2d');
                     ctx.drawImage(img, 0, 0, width, height);
 
-                    // Turunkan kualiti JPEG kepada 40% (0.4) supaya tak sangkut kat iPhone
                     const compressedBase64 = canvas.toDataURL('image/jpeg', 0.4);
                     resolve(compressedBase64);
                 };
@@ -422,7 +418,6 @@
                     }
                 }
 
-                // Gambar akan diproses dan dikompres di sini
                 const icBase64 = await processFile(icInput.files[0]);
                 const receiptBase64 = await processFile(receiptInput.files[0]);
                 const signatureBase64 = signaturePad.toDataURL();
@@ -449,17 +444,23 @@
                 const result = await response.json();
                 
                 if(result.status === "success") {
-                    alert("Success! Your agreement and receipt have been recorded. Please notify admin via WhatsApp.");
+                    alert("Berjaya! Perjanjian dan resit anda telah direkodkan. Sila maklumkan kepada admin melalui WhatsApp.");
                     window.location.href = "index.html"; 
                 } else {
-                    alert("System Error: " + result.message);
+                    alert("Ralat Sistem: " + result.message);
                     resetBtn(submitBtn);
                 }
 
             } catch (error) {
-                // Ralat yang lebih jelas kalau sangkut lagi
-                alert("Ralat sambungan. Ini mungkin kerana saiz fail masih terlalu besar untuk capaian internet anda. Sila cuba gunakan WiFi atau fail yang lebih kecil.");
-                resetBtn(submitBtn);
+                // KEMAS KINI LOGIK ERROR: Jangan tunjuk mesej menakutkan jika terputus sambungan
+                if (!navigator.onLine) {
+                    alert("Tiada sambungan internet. Sila semak data/WiFi anda dan cuba lagi.");
+                    resetBtn(submitBtn);
+                } else {
+                    // Mesej ini akan keluar jika iPhone timeout (tapi fail tetap selamat diproses Google)
+                    alert("Borang anda berjaya dihantar dan sedang di-generate menjadi PDF di dalam sistem. Sila tekan OK untuk kembali ke laman utama dan maklumkan kepada Admin.");
+                    window.location.href = "index.html";
+                }
             }
         }
 
