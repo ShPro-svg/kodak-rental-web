@@ -55,7 +55,7 @@
         th { text-align: left; padding: 15px 12px; border-bottom: 2px solid var(--bg-base); color: var(--text-secondary); font-weight: 600; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.5px;}
         td { padding: 15px 12px; border-bottom: 1px solid var(--bg-base); font-weight: 500; vertical-align: top;}
 
-        /* BUTTONS & ACTIONS (KEMASKINI SUSUNAN) */
+        /* BUTTONS & ACTIONS */
         .action-group { display: flex; flex-direction: column; gap: 8px; width: 100%; min-width: 140px;}
         .btn-action { width: 100%; padding: 10px 12px; border-radius: 10px; border: none; cursor: pointer; font-size: 0.8rem; font-weight: 600; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 6px; }
         .btn-approve { background: var(--brand-main); color: white; }
@@ -94,20 +94,23 @@
         .btn-snap:active { transform: scale(0.95); }
         .btn-close-cam { flex: 1; padding: 15px; background: #333; color: white; border: none; border-radius: 50px; font-weight: bold; cursor: pointer; }
 
-        /* LOADING OVERLAY */
-        .loading-overlay { display: none; position: fixed; z-index: 9999; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.9); flex-direction: column; align-items: center; justify-content: center; color: var(--brand-main); }
-        .loading-overlay i { font-size: 3rem; margin-bottom: 10px; }
-        .loading-overlay p { font-weight: 700; font-size: 1rem; }
+        /* LOADING OVERLAY DENGAN GLASSMORPHISM */
+        .loading-overlay { display: none; position: fixed; z-index: 9999; top: 0; left: 0; width: 100%; height: 100%; background: rgba(255,255,255,0.85); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); flex-direction: column; align-items: center; justify-content: center; color: var(--brand-main); text-align: center; }
+        .loading-spinner { width: 60px; height: 60px; border: 6px solid var(--brand-light); border-top-color: var(--brand-main); border-radius: 50%; animation: spin 1s cubic-bezier(0.55, 0.15, 0.45, 0.85) infinite; margin-bottom: 20px; box-shadow: 0 0 15px rgba(0, 77, 192, 0.2); }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .loading-text { color: var(--brand-dark); font-weight: 700; font-size: 1.1rem; animation: pulse 1.5s infinite; }
+        .loading-subtext { color: var(--text-secondary); font-size: 0.8rem; margin-top: 5px; font-weight: 500; }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
     </style>
 </head>
 <body>
     
     <div class="loading-overlay" id="loadingOverlay">
-        <i class="ph ph-spinner ph-spin"></i>
-        <p>Memuat naik gambar ke Drive...</p>
+        <div class="loading-spinner"></div>
+        <div class="loading-text">Sedang Diproses...</div>
+        <div class="loading-subtext">Menghantar gambar ke sistem. Sila tunggu.</div>
     </div>
 
-    <!-- CUSTOM CONFIRMATION MODAL -->
     <div class="modal-overlay" id="deleteModal">
         <div class="modal-box">
             <h3>Padam Tempahan?</h3>
@@ -119,7 +122,6 @@
         </div>
     </div>
 
-    <!-- IN-APP CAMERA MODAL -->
     <div class="camera-overlay" id="cameraOverlay">
         <div class="camera-header" id="cameraTitle">Ambil Gambar Logistik</div>
         <div class="camera-view">
@@ -154,13 +156,11 @@
             </div>
         </div>
 
-        <!-- TAB BUTTONS -->
         <div class="tab-container">
             <div class="tab-btn active" onclick="switchTab('pending')" id="btn-pending"><i class="ph-fill ph-clock"></i> Pending Requests</div>
             <div class="tab-btn" onclick="switchTab('confirmed')" id="btn-confirmed"><i class="ph-fill ph-check-circle"></i> Approved Bookings</div>
         </div>
 
-        <!-- PENDING TAB CONTENT -->
         <div class="card tab-content active" id="tab-pending">
             <table>
                 <thead>
@@ -177,7 +177,6 @@
             </table>
         </div>
 
-        <!-- CONFIRMED TAB CONTENT -->
         <div class="card tab-content" id="tab-confirmed">
             <table>
                 <thead>
@@ -356,7 +355,7 @@
             else { showToast("Tempahan diluluskan!"); loadAdmin(); }
         }
 
-        // --- IN-APP LIVE CAMERA LOGIC (COMPRESSED IMAGE + ERROR HANDLING) ---
+        // --- IN-APP LIVE CAMERA LOGIC DENGAN COMPRESSION ---
         async function openLiveCamera(type, bookingId, customerName) {
             currentUploadData = { type: type, bookingId: bookingId, customerName: customerName };
             document.getElementById('cameraTitle').innerText = type === 'delivery' ? 'Bukti Serahan (Delivery)' : 'Bukti Pulangan (Return)';
@@ -391,14 +390,16 @@
             const video = document.getElementById('videoElement');
             const canvas = document.getElementById('canvasElement');
             
-            // Limit saiz kepada max 800px untuk elak ralat timeout di iPhone / GAS
-            const MAX_WIDTH = 800;
+            // Kompresi tahap maksimum (Max 600px)
+            const MAX_WIDTH = 600; 
+            const MAX_HEIGHT = 800;
             let width = video.videoWidth;
             let height = video.videoHeight;
             
-            if (width > MAX_WIDTH) {
-                height = Math.round((height * MAX_WIDTH) / width);
-                width = MAX_WIDTH;
+            if (width > height) {
+                if (width > MAX_WIDTH) { height *= MAX_WIDTH / width; width = MAX_WIDTH; }
+            } else {
+                if (height > MAX_HEIGHT) { width *= MAX_HEIGHT / height; height = MAX_HEIGHT; }
             }
             
             canvas.width = width;
@@ -407,13 +408,14 @@
             const ctx = canvas.getContext('2d');
             ctx.drawImage(video, 0, 0, width, height);
             
-            // Set kualiti 0.6 (60%) supaya file lebih ringan untuk dihantar ke Google Drive
-            const base64Data = canvas.toDataURL('image/jpeg', 0.6);
+            // Kualiti 40% (0.4) supaya laju dan tak Timeout
+            const base64Data = canvas.toDataURL('image/jpeg', 0.4);
             
             closeCamera();
             uploadPhotoToDrive(base64Data);
         }
 
+        // --- PENAMBAHBAIKAN C.O.R.S (Elak "Load failed" di iPhone/Safari) ---
         async function uploadPhotoToDrive(base64Data) {
             document.getElementById('loadingOverlay').style.display = 'flex';
 
@@ -428,6 +430,10 @@
 
                 const response = await fetch(GAS_URL, {
                     method: "POST",
+                    // Header text/plain di bawah amat penting untuk elak iPhone Safari sekat connection (CORS preflight)
+                    headers: {
+                        "Content-Type": "text/plain;charset=utf-8"
+                    },
                     body: JSON.stringify(payload)
                 });
                 
@@ -439,7 +445,8 @@
                     alert("Ralat sistem Drive: " + result.message);
                 }
             } catch (err) {
-                alert("Ralat sambungan: " + err.message + ". Sila semak status deployment Google Apps Script anda.");
+                // Walaupun timeout, gambar selalunya berjaya diproses di latar belakang Google
+                alert("Gambar mungkin sedang diproses di latar belakang. Sila semak Google Drive sebentar lagi. Ralat teknikal: " + err.message);
             }
 
             document.getElementById('loadingOverlay').style.display = 'none';
