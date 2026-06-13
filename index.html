@@ -47,6 +47,14 @@
         .rates-table td { padding: 12px 0; border-bottom: 1px solid var(--bg-base); font-weight: 500;}
         .price-tag { font-weight: 700; color: var(--brand-main); text-align: right; }
 
+        /* FAQ SECTION (BARU) */
+        .faq-item { border-bottom: 1px solid var(--border-strong); padding: 14px 0; }
+        .faq-item:last-child { border-bottom: none; padding-bottom: 0; }
+        .faq-question { font-weight: 700; font-size: 0.85rem; color: var(--brand-dark); display: flex; align-items: center; justify-content: space-between; cursor: pointer; transition: 0.2s;}
+        .faq-question:hover { color: var(--brand-main); }
+        .faq-answer { font-size: 0.75rem; color: var(--text-secondary); margin-top: 8px; line-height: 1.5; display: none; }
+        .faq-answer.show { display: block; animation: fadeIn 0.3s; }
+
         /* BUTTONS */
         .btn-primary { width: 100%; padding: 16px; background: var(--brand-main); color: var(--bg-white); border: none; border-radius: 16px; font-size: 1rem; font-weight: 600; cursor: pointer; display: flex; justify-content: center; align-items: center; gap: 10px; transition: 0.2s; box-shadow: 0 4px 15px rgba(0, 77, 192, 0.15);}
         .btn-primary:active { transform: scale(0.98); background: var(--brand-dark); }
@@ -102,6 +110,8 @@
         .floating-wa i {
             font-size: 1.2rem;
         }
+        
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
     </style>
 </head>
 <body>
@@ -131,14 +141,36 @@
                 </thead>
                 <tbody>
                     <tr><td>Isnin - Khamis (Weekdays)</td><td class="price-tag">RM 18 / hari</td></tr>
-                    <tr><td>Weekdays (4 Hari & ke atas)</td><td class="price-tag">RM 15 / hari</td></tr>
+                    <tr><td>Weekdays (3 Hari & ke atas)</td><td class="price-tag">RM 15 / hari</td></tr>
                     <tr><td>Jumaat - Ahad (Weekends)</td><td class="price-tag">RM 25 / hari</td></tr>
+                    <tr><td>Weekends (2 Hari & ke atas)</td><td class="price-tag">RM 20 / hari</td></tr>
                     <tr><td>Pakej Mingguan (7 Hari)</td><td class="price-tag">RM 100 nett</td></tr>
                 </tbody>
             </table>
-            <p style="font-size: 0.75rem; color: var(--text-secondary); font-weight: 500; margin-top: 10px;">
-                <i class="ph-fill ph-info" style="color: var(--brand-main);"></i> Termasuk kamera, bateri, SD Card, reader, strap & pouch. Deposit sekuriti RM20 (Refundable).
-            </p>
+        </div>
+
+        <div class="card">
+            <h3 class="card-title" style="margin-bottom: 15px;"><i class="ph-fill ph-info" style="color: var(--brand-main);"></i> Info Penting & QnA</h3>
+            
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFaq(this)">1. Apa yang termasuk dalam pakej? <i class="ph ph-caret-down"></i></div>
+                <div class="faq-answer">Korang akan dapat <strong>Kamera Kodak FZ55, Bateri, SD Card, Card Reader (Type-C & iPhone), Strap Tangan,</strong> dan <strong>Pouch Kamera</strong>. Gambar boleh terus transfer masuk phone!</div>
+            </div>
+            
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFaq(this)">2. Ada deposit tak? <i class="ph ph-caret-down"></i></div>
+                <div class="faq-answer">Ya, deposit sekuriti sebanyak <strong>RM20</strong> diperlukan. Deposit ini akan <em>refund</em> 100% bila kamera dipulangkan dalam keadaan baik dan cukup sifatnya.</div>
+            </div>
+            
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFaq(this)">3. Kat mana lokasi Pickup/Return? <i class="ph ph-caret-down"></i></div>
+                <div class="faq-answer">Lokasi pertemuan (COD) adalah di sekitar kawasan <strong>Pintu Utama UTM KL</strong> atau <strong>Stesen LRT terdekat</strong> (mengikut budi bicara bersama).</div>
+            </div>
+            
+            <div class="faq-item">
+                <div class="faq-question" onclick="toggleFaq(this)">4. Boleh cancel booking tak? <i class="ph ph-caret-down"></i></div>
+                <div class="faq-answer">Boleh! Batal lebih dari 24 jam: <strong>100% Refund</strong>. Batal kurang dari 24 jam: Deposit RM20 akan hangus, tapi yuran sewa akan dipulangkan.</div>
+            </div>
         </div>
 
         <button class="btn-primary" id="btnToggle">
@@ -233,6 +265,20 @@
         let startDateStr = '';
         let endDateStr = '';
         let fpInstance;
+
+        // --- FUNGSI TOGGLE FAQ (BARU) ---
+        function toggleFaq(element) {
+            const answer = element.nextElementSibling;
+            const icon = element.querySelector('i');
+            
+            if (answer.classList.contains('show')) {
+                answer.classList.remove('show');
+                icon.classList.replace('ph-caret-up', 'ph-caret-down');
+            } else {
+                answer.classList.add('show');
+                icon.classList.replace('ph-caret-down', 'ph-caret-up');
+            }
+        }
 
         // Tarik tarikh booked dari Supabase
         async function fetchBookedDates() {
