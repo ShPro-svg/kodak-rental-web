@@ -22,10 +22,11 @@
             --text-primary: #0A0A0A;  
             --text-secondary: #52525C;
             --border-strong: #E4E4E7;
+            --whatsapp-green: #25D366; /* Warna Khas WhatsApp */
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Poppins', sans-serif; -webkit-tap-highlight-color: transparent; }
-        body { background-color: var(--bg-base); color: var(--text-primary); padding: 20px 15px 40px; display: flex; flex-direction: column; align-items: center; min-height: 100vh;}
+        body { background-color: var(--bg-base); color: var(--text-primary); padding: 20px 15px 80px; display: flex; flex-direction: column; align-items: center; min-height: 100vh;}
         
         .app-wrapper { width: 100%; max-width: 500px; display: flex; flex-direction: column; gap: 20px; }
         
@@ -62,8 +63,8 @@
         /* CALENDAR DISABLED DATES (MERAH) */
         .flatpickr-day.flatpickr-disabled,
         .flatpickr-day.flatpickr-disabled:hover {
-            background: #FEE2E2 !important; /* Merah cair */
-            color: #991B1B !important;    /* Merah pekat */
+            background: #FEE2E2 !important; 
+            color: #991B1B !important;    
             border-color: #FEE2E2 !important;
             font-weight: 700;
         }
@@ -73,9 +74,43 @@
         .form-group label { display: block; font-size: 0.8rem; font-weight: 600; color: var(--text-primary); margin-bottom: 6px; }
         input, select { width: 100%; padding: 14px; border-radius: 12px; border: 1px solid var(--border-strong); background: var(--bg-white); font-size: 0.9rem; outline: none; transition: 0.2s; -webkit-appearance: none; color: var(--text-primary);}
         input:focus, select:focus { border-color: var(--brand-main); box-shadow: 0 0 0 3px var(--brand-light); }
+
+        /* FLOATING WHATSAPP BUTTON (SAIZ DIKECILKAN UNTUK PHONE) */
+        .floating-wa {
+            position: fixed;
+            bottom: 15px;
+            right: 15px;
+            background: var(--whatsapp-green);
+            color: white;
+            border-radius: 50px;
+            padding: 8px 14px 8px 12px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            text-decoration: none;
+            box-shadow: 0 4px 15px rgba(37, 211, 102, 0.4);
+            z-index: 1000;
+            transition: 0.3s;
+            font-weight: 600;
+            font-size: 0.75rem;
+        }
+        .floating-wa:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 6px 20px rgba(37, 211, 102, 0.6);
+            color: white;
+        }
+        .floating-wa i {
+            font-size: 1.2rem;
+        }
     </style>
 </head>
 <body>
+
+    <a href="https://wa.me/601139585168?text=Hi%20RentACam%20MY!%20Saya%20ada%20soalan%20berkenaan%20sewaan%20kamera..." class="floating-wa" target="_blank">
+        <i class="ph-fill ph-whatsapp-logo"></i>
+        <span>Ada Soalan?</span>
+    </a>
+
     <div class="app-wrapper">
         
         <div class="header">
@@ -176,7 +211,7 @@
                             <input type="text" id="location" placeholder="Cth: Pintu Utama UTM KL, Stesen LRT" required>
                         </div>
                         
-                        <button type="submit" class="btn-primary" style="background: var(--brand-dark); margin-top: 10px;">
+                        <button type="submit" class="btn-primary" style="background: var(--whatsapp-green); box-shadow: 0 4px 15px rgba(37, 211, 102, 0.2); margin-top: 10px;">
                             <i class="ph ph-whatsapp-logo" style="font-size: 1.2rem;"></i> Confirm via WhatsApp
                         </button>
                     </form>
@@ -188,9 +223,9 @@
 
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script>
-        // MASUKKAN KREDENSIAL SUPABASE KAU DI SINI
+        // KREDENSIAL SUPABASE
         const SUPABASE_URL = "https://udoncfzvxixbmjwkogew.supabase.co";
-        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVkb25jZnp2eGl4Ym1qd2tvZ2V3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk4OTIzNjYsImV4cCI6MjA5NTQ2ODM2Nn0.dH7XDMhJMDaygZDL_rGU72wK2BU_QjiMJ-Iu0kcZ0jw"; // Pastikan key kau dimasukkan!
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVkb25jZnp2eGl4Ym1qd2tvZ2V3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk4OTIzNjYsImV4cCI6MjA5NTQ2ODM2Nn0.dH7XDMhJMDaygZDL_rGU72wK2BU_QjiMJ-Iu0kcZ0jw"; 
         
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -297,7 +332,7 @@
                 btnSubmit.style.pointerEvents = 'auto';
             } else {
                 const bookingId = data[0].id;
-                // GANTIKAN NOMBOR WHATSAPP KAU DI SINI
+                // NOMBOR WHATSAPP SEBENAR KAU
                 const phoneNumber = "601139585168"; 
                 
                 const message = `Hi RentACam MY! 📸\n\nSaya telah membuat tempahan (ID: ${bookingId.slice(0,5)}). Tolong check maklumat saya di sistem. Terima kasih!`;
