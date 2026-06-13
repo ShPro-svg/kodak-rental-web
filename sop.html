@@ -11,14 +11,12 @@
     
     <style>
         :root {
-            /* TEMA WARNA RASMI RENTACAM MY */
-            --brand-main: #004DC0;    /* Tech Blue */
-            --brand-light: #D8ECF9;   /* Ice Blue */
-            --brand-dark: #0E1334;    /* Sapphire */
-            
+            --brand-main: #004DC0; 
+            --brand-light: #D8ECF9; 
+            --brand-dark: #0E1334;
             --bg-white: #FFFFFF;
             --bg-base: #F4F4F5;
-            --text-primary: #0A0A0A;  /* Rich Black */
+            --text-primary: #0A0A0A; 
             --text-secondary: #52525C;
             --border-strong: #E4E4E7;
             --highlight-green: #10b981;
@@ -26,61 +24,37 @@
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Poppins', sans-serif; -webkit-tap-highlight-color: transparent; }
         
-        body { 
-            background-color: var(--bg-base); 
-            color: var(--text-primary); 
-            min-height: 100vh; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            padding: 10px 10px 30px; 
-        }
-        
-        /* GAP DIKECILKAN DARI 20px KEPADA 12px */
-        .app-wrapper { 
-            width: 100%; 
-            max-width: 550px; 
-            display: flex; 
-            flex-direction: column; 
-            gap: 12px; 
-        }
+        body { background-color: var(--bg-base); color: var(--text-primary); min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 10px 10px 30px; }
+        .app-wrapper { width: 100%; max-width: 550px; display: flex; flex-direction: column; gap: 12px; }
         
         .header { text-align: center; padding: 5px 0; }
         .header h1 { font-size: 1.6rem; font-weight: 800; display: flex; align-items: center; justify-content: center; gap: 8px; color: var(--brand-main); letter-spacing: -0.5px;}
 
-        /* PADDING KOTAK DIKECILKAN SUPAYA LEBIH KEMAS */
         .card { background: var(--bg-white); border: 1px solid var(--border-strong); border-radius: 20px; padding: 18px; box-shadow: 0 4px 15px rgba(10, 10, 10, 0.03); position: relative; }
         .card h2 { font-size: 1.05rem; font-weight: 700; display: flex; align-items: center; gap: 8px; margin: 0; color: var(--brand-dark); }
         .card-header-flex { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
         
-        /* LANGUAGE TOGGLE */
         .lang-toggle { position: absolute; top: 15px; right: 15px; display: flex; gap: 4px; background: var(--bg-base); padding: 4px; border-radius: 8px; border: 1px solid var(--border-strong);}
         .lang-btn { border: none; padding: 4px 10px; border-radius: 6px; font-size: 0.7rem; font-weight: 700; cursor: pointer; transition: 0.2s; background: transparent; color: var(--text-secondary);}
         .lang-btn.active { background: var(--brand-main); color: var(--bg-white); }
 
-        /* TERMS SCROLL BOX */
         .terms-box { height: 350px; overflow-y: scroll; border: 1px solid var(--border-strong); padding: 12px; font-size: 0.75rem; border-radius: 12px; background: #FAFAFA; margin: 15px 0 12px; line-height: 1.5; text-align: justify; }
         .terms-content { display: none; animation: fadeIn 0.3s; }
         .terms-content.active { display: block; }
         .terms-box p { margin-bottom: 10px; color: var(--text-primary); }
         .terms-box strong { color: var(--brand-main); font-weight: 700; display: block; margin-top: 8px; margin-bottom: 2px; font-size: 0.8rem;}
-        .terms-box strong:first-child { margin-top: 0; }
         
         .checkbox-container { display: flex; align-items: center; gap: 10px; font-size: 0.8rem; font-weight: 600; background: var(--brand-light); padding: 12px; border-radius: 10px; color: var(--brand-dark); cursor: pointer; transition: 0.2s; border: 1px solid var(--brand-main);}
-        .checkbox-container:active { transform: scale(0.98); }
         .checkbox-container input { width: 16px; height: 16px; cursor: pointer; accent-color: var(--brand-main); }
 
-        /* PAYMENT SECTION */
         .payment-flex { display: flex; gap: 12px; align-items: center; background: var(--brand-dark); color: var(--bg-white); padding: 15px; border-radius: 14px; margin-bottom: 15px; box-shadow: 0 4px 10px rgba(10,10,10,0.1);}
         .payment-text { flex: 1; }
         .payment-text h3 { margin: 0 0 3px 0; font-size: 1rem; color: var(--brand-light);}
         .payment-text p { margin: 0; font-size: 0.75rem; opacity: 0.9; line-height: 1.3; }
         .payment-text .acc-no { font-size: 1.25rem; font-weight: 800; letter-spacing: 1px; margin: 5px 0; color: var(--highlight-green); }
-        
         .payment-qr { width: 90px; height: 90px; background: var(--bg-white); border-radius: 10px; padding: 4px; display: flex; align-items: center; justify-content: center; overflow: hidden;}
         .payment-qr img { max-width: 100%; height: auto; display: block;}
 
-        /* UPLOAD AREA */
         .form-group { margin-bottom: 15px; }
         .form-group.border-bottom { border-bottom: 1px solid var(--border-strong); padding-bottom: 15px; }
         .upload-area { border: 2px dashed var(--border-strong); border-radius: 14px; padding: 15px; text-align: center; cursor: pointer; transition: 0.2s; background: #FAFAFA;}
@@ -90,69 +64,27 @@
         .file-name { font-size: 0.7rem; color: var(--text-secondary); margin-top: 5px; }
         
         .btn-example { background: var(--border-strong); color: var(--text-primary); border: none; padding: 5px 10px; border-radius: 6px; font-size: 0.7rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 4px; transition: 0.2s;}
-        .btn-example:hover { background: var(--brand-light); color: var(--brand-main); }
         
         #signature-pad { border: 1px solid var(--border-strong); border-radius: 14px; width: 100%; height: 180px; background: #FAFAFA; touch-action: none; margin-bottom: 8px; }
         
-        /* SUBMIT BUTTON */
         .btn-submit { width: 100%; padding: 14px; background: var(--brand-main); color: var(--bg-white); border: none; border-radius: 14px; font-weight: 600; font-size: 0.95rem; cursor: pointer; transition: 0.2s; opacity: 0.5; pointer-events: none; display: flex; justify-content: center; align-items: center; gap: 8px;}
         .btn-submit.active { opacity: 1; pointer-events: auto; }
-        .btn-submit.active:active { transform: scale(0.98); background: var(--brand-dark); }
-        
         .hidden-section { display: none; }
         .hidden-section.show { display: block; animation: fadeIn 0.5s; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* GUIDE MODAL (POPUP) */
         .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background-color: rgba(10,10,10,0.8); backdrop-filter: blur(5px); justify-content: center; align-items: center; padding: 20px; }
         .modal-content { background-color: var(--bg-white); padding: 25px; border-radius: 20px; max-width: 350px; width: 100%; text-align: center; position: relative; animation: zoomIn 0.3s; }
         @keyframes zoomIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
         .modal-content img { max-width: 100%; height: auto; border-radius: 10px; border: 1px solid var(--border-strong); margin-top: 10px;}
         .close-modal { position: absolute; top: 12px; right: 18px; font-size: 1.5rem; cursor: pointer; color: var(--text-secondary); }
 
-        /* KOD ANIMASI LOADING LAWA (GLASSMORPHISM) */
-        .loading-overlay {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(8px);
-            -webkit-backdrop-filter: blur(8px);
-            z-index: 9999;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-        }
-        .loading-spinner {
-            width: 60px;
-            height: 60px;
-            border: 6px solid var(--brand-light);
-            border-top-color: var(--brand-main);
-            border-radius: 50%;
-            animation: spin 1s cubic-bezier(0.55, 0.15, 0.45, 0.85) infinite;
-            margin-bottom: 20px;
-            box-shadow: 0 0 15px rgba(0, 77, 192, 0.2);
-        }
+        .loading-overlay { display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255, 255, 255, 0.85); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 9999; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+        .loading-spinner { width: 60px; height: 60px; border: 6px solid var(--brand-light); border-top-color: var(--brand-main); border-radius: 50%; animation: spin 1s cubic-bezier(0.55, 0.15, 0.45, 0.85) infinite; margin-bottom: 20px; box-shadow: 0 0 15px rgba(0, 77, 192, 0.2); }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .loading-text {
-            color: var(--brand-dark);
-            font-weight: 700;
-            font-size: 1.1rem;
-            animation: pulse 1.5s infinite;
-        }
-        .loading-subtext {
-            color: var(--text-secondary);
-            font-size: 0.8rem;
-            margin-top: 5px;
-            font-weight: 500;
-        }
+        .loading-text { color: var(--brand-dark); font-weight: 700; font-size: 1.1rem; animation: pulse 1.5s infinite; }
+        .loading-subtext { color: var(--text-secondary); font-size: 0.8rem; margin-top: 5px; font-weight: 500; }
         @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
-
-        @media (max-width: 400px) {
-            .payment-flex { flex-direction: column; text-align: center; padding: 15px; }
-            .payment-text .acc-no { font-size: 1.1rem; }
-        }
     </style>
 </head>
 <body>
@@ -181,8 +113,9 @@
                     
                     <strong>1. RENTAL RATES & PACKAGE</strong>
                     <p>• Weekdays (Monday - Thursday): RM18/day<br>
-                    • Weekdays (4 days and above): RM15/day<br>
+                    • Weekdays (3 days and above): RM15/day<br>
                     • Weekends (Friday - Sunday): RM25/day<br>
+                    • Weekends (2 days and above): RM20/day<br>
                     • Weekly Package (7 consecutive days): RM100</p>
                     <p>Rental Package Includes: 1x Kodak Camera, 1x Battery, 1x SD Card, 1x SD Card Reader (Type-C / Lightning), 1x Hand Strap, 1x Camera Pouch / Bag.</p>
                     <p>Security Deposit: A refundable security deposit of RM20 is required for every rental. The deposit will be fully refunded once the camera and all accessories are returned in good working condition, complete, and without damage.</p>
@@ -222,8 +155,9 @@
                     
                     <strong>1. KADAR SEWAAN & PAKEJ</strong>
                     <p>• Hari Biasa (Isnin - Khamis): RM18/hari<br>
-                    • Hari Biasa (4 hari dan ke atas): RM15/hari<br>
+                    • Hari Biasa (3 Hari & ke atas): RM15/hari<br>
                     • Hujung Minggu (Jumaat - Ahad): RM25/hari<br>
+                    • Hujung Minggu (2 Hari & ke atas): RM20/hari<br>
                     • Pakej Mingguan (7 hari berturut-turut): RM100</p>
                     <p>Pakej Sewaan Termasuk: 1x Kamera Kodak, 1x Bateri, 1x Kad SD, 1x Pembaca Kad SD (Type-C / Lightning), 1x Tali Tangan, 1x Pouch / Beg Kamera.</p>
                     <p>Deposit Keselamatan: Deposit keselamatan sebanyak RM20 diperlukan untuk setiap sewaan. Deposit akan dipulangkan sepenuhnya sebaik sahaja kamera dan semua aksesori dipulangkan dalam keadaan baik, lengkap, dan tanpa sebarang kerosakan.</p>
@@ -272,11 +206,10 @@
                 
                 <div class="payment-flex">
                     <div class="payment-text">
-                    <h3>Maybank</h3>
-                    <div class="acc-no">1550 1553 7154</div>
-                    <p>MUHAMMAD SHAMSIR B ISMAIL</p>
-                </div>
-                
+                        <h3>Maybank</h3>
+                        <div class="acc-no">1550 1553 7154</div>
+                        <p>MUHAMMAD SHAMSIR B ISMAIL</p>
+                    </div>
                     <div class="payment-qr">
                         <img src="qr-code.png" alt="Payment QR" onerror="this.style.display='none'">
                     </div>
@@ -334,14 +267,12 @@
 
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <script>
-        let currentLang = "en"; // PENGISYTIHARAN BAHASA GLOBAL
+        let currentLang = "en"; 
 
-        // KREDENSIAL SUPABASE
         const SUPABASE_URL = "https://udoncfzvxixbmjwkogew.supabase.co";
         const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InVkb25jZnp2eGl4Ym1qd2tvZ2V3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk4OTIzNjYsImV4cCI6MjA5NTQ2ODM2Nn0.dH7XDMhJMDaygZDL_rGU72wK2BU_QjiMJ-Iu0kcZ0jw";
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-        // --- LANGUAGE TOGGLE LOGIC ---
         function setLang(lang) {
             currentLang = lang; 
             
@@ -360,13 +291,11 @@
             }
         }
 
-        // --- MODAL GUIDE LOGIC ---
         const modal = document.getElementById('guideModal');
         function showGuide() { modal.style.display = 'flex'; }
         function hideGuide() { modal.style.display = 'none'; }
         window.onclick = function(event) { if (event.target == modal) { hideGuide(); } }
 
-        // --- SIGNATURE PAD LOGIC ---
         const canvas = document.getElementById("signature-pad");
         function resizeCanvas() {
             const ratio =  Math.max(window.devicePixelRatio || 1, 1);
@@ -402,7 +331,6 @@
             }
         }
 
-        // --- SISTEM KOMPRESI GAMBAR AGGRESIF (MENCEGAH TIMEOUT PHONE) ---
         const processFile = (file) => new Promise((resolve, reject) => {
             if (file.type === 'application/pdf') {
                 const reader = new FileReader();
@@ -450,7 +378,6 @@
             reader.onerror = error => reject(error);
         });
 
-        // --- SUBMIT TO GOOGLE DRIVE DENGAN UI/UX LAWA ---
         async function submitForm() {
             const icInput = document.getElementById('icInput');
             const receiptInput = document.getElementById('receiptInput');
@@ -462,7 +389,6 @@
             if (receiptInput.files.length === 0) { alert(currentLang === 'bm' ? "Sila muat naik Resit Pembayaran." : "Please upload Payment Receipt."); return; }
             if (signaturePad.isEmpty()) { alert(currentLang === 'bm' ? "Sila tandatangan pada ruangan yang disediakan." : "Please sign the agreement."); return; }
 
-            // Tunjuk Animasi Loading
             if(currentLang === 'bm') {
                 loadingTitle.innerText = "Sedang Diproses...";
                 loadingSub.innerText = "Sila tunggu sebentar, dokumen sedang dienkripsi.";
@@ -481,7 +407,6 @@
                 let times = "N/A";
                 let location = "N/A";
 
-                // Tarik rekod dari Supabase
                 if(bookingId) {
                     const { data, error } = await supabaseClient.from('bookings').select('*').eq('id', bookingId).single();
                     if(data) {
@@ -492,7 +417,6 @@
                     }
                 }
 
-                // Kompres gambar
                 const icBase64 = await processFile(icInput.files[0]);
                 const receiptBase64 = await processFile(receiptInput.files[0]);
                 const signatureBase64 = signaturePad.toDataURL();
@@ -534,7 +458,6 @@
             } catch (error) {
                 overlay.style.display = "none";
                 
-                // Mesej mesra walaupun timeout
                 const timeoutMsg = currentLang === 'bm'
                     ? "Tahniah! Maklumat anda telah berjaya dihantar ke sistem kami. Anda boleh memaklumkan kepada admin kami untuk pengesahan penyewaan. Terima kasih!"
                     : "Congratulations! Your information has been successfully submitted to our system. You may notify our admin for booking confirmation. Thank you!";
